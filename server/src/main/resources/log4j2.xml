@@ -1,0 +1,19 @@
+<Configuration xmlns="http://logging.apache.org/log4j/2.0/config">
+    <Properties>
+        <Property name="PATTERN">%d{DEFAULT} %-5level --- [%15threadName] %-40class{1.} : %msg%n</Property>
+    </Properties>
+    <Appenders>
+        <Console name="Console" target="">
+            <PatternLayout pattern="${PATTERN}"/>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <Root level="INFO">
+            <AppenderRef ref="Console"/>
+        </Root>
+        <Logger name="dev.drzepka.smarthome.terminal" level="DEBUG" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
+    </Loggers>
+</Configuration>
