@@ -27,10 +27,13 @@ open class TerminalClient constructor(private val terminalApiUrl: String, privat
     fun register() {
         log.info("Registering terminal client {}", clientManager.clientName)
         runBlocking {
-            httpClient.post<RegisterClientResponse>("$terminalApiUrl/clients/register") {
+            val response = httpClient.post<RegisterClientResponse>("$terminalApiUrl/clients/register") {
                 contentType(ContentType.Application.Json)
                 body = RegisterClientRequest(clientManager.clientName, "TODO: secret")
             }
+
+            log.info("Client registered with id {}", response.clientId)
+            log.debug("Full response: {}", response)
         }
 
         createShutdownHook()

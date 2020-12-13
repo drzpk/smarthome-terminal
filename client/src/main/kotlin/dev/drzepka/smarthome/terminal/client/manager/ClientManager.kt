@@ -53,8 +53,8 @@ abstract class ClientManager : TerminalQueue.Handler {
 
     @Suppress("UNCHECKED_CAST")
     override fun <Response : MessageResponse> processMessage(message: Message<Response>): Response {
-        //if (log.isTraceEnabled)
-        log.info("Processing message: ${message.javaClass.simpleName}")
+        if (log.isTraceEnabled)
+            log.trace("Processing message: ${message.javaClass.simpleName}")
 
         return when (message) {
             is PingMessage -> processPingMessage(message) as Response

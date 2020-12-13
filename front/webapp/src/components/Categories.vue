@@ -19,10 +19,7 @@
         }
     })
     export default class Categories extends Vue {
-        mounted(): void {
-            this.$store.dispatch("setActiveApplication"); // todo: move to the right place
-            this.$store.dispatch("setActiveCategory");
-        }
+
     }
 </script>
 

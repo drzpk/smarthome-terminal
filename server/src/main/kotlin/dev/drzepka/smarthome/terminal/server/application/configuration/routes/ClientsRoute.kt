@@ -21,8 +21,8 @@ fun Route.clients() {
 
         post("/register") {
             val request = call.receive<RegisterClientRequest>()
-            clientService.registerClient(request.clientName, request.clientSecret)
-            val response = RegisterClientResponse(true, "success", "not implemented yet")
+            val client = clientService.registerClient(request.clientName, request.clientSecret)
+            val response = RegisterClientResponse(true, client.id, "success", "not implemented yet")
             call.respond(response)
         }
 

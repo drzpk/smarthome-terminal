@@ -1,5 +1,5 @@
 <template>
-    <b-container id="container">
+    <b-container id="container" v-if="application != null">
         <b-row>
             <b-col cols="3">
                 <Categories></Categories>
@@ -15,16 +15,20 @@
     import {Component, Vue} from "vue-property-decorator";
     import Categories from "@/components/Categories.vue";
     import Screen from "@/components/Screen.vue";
+    import {mapState} from "vuex";
 
     @Component({
         components: {
             Categories,
             Screen
         },
-        // todo: get categories from vuex
+        computed: {
+            ...mapState([
+                "application"
+            ])
+        }
     })
     export default class Configurator extends Vue {
-
     }
 </script>
 

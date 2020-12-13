@@ -5,7 +5,7 @@ import dev.drzepka.smarthome.terminal.common.transport.message.PingMessage
 import dev.drzepka.smarthome.terminal.common.util.Logger
 import dev.drzepka.smarthome.terminal.server.domain.Configuration
 import dev.drzepka.smarthome.terminal.server.domain.converter.ConversionService
-import dev.drzepka.smarthome.terminal.server.domain.entity.Category
+import dev.drzepka.smarthome.terminal.server.domain.value.Category
 import dev.drzepka.smarthome.terminal.server.domain.repository.ClientRepository
 import dev.drzepka.smarthome.terminal.server.domain.entity.Client
 import kotlinx.coroutines.CoroutineScope
@@ -30,12 +30,17 @@ class ClientService(
     }
 
     suspend fun findClient(id: Int): Client? {
-        log.debug("Finding client id={}", id)
+        log.debug("Looking for client id={}", id)
         val client = clientRepository.findById(id) ?: return null
 
         log.debug("{} found", client)
         initializeClient(client)
         return client
+    }
+
+    fun getAllClients(): Collection<Client> {
+        log.debug("Getting all clients")
+        return clientRepository.findAll()
     }
 
     fun registerClient(clientName: String, clientSecret: String): Client {

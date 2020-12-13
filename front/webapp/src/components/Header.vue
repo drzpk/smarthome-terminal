@@ -8,7 +8,8 @@
                 <b-col cols="2" offset="4">
                     <div id="app-selector">
                         <label>Active application:</label>
-                        <b-form-select :options="applications" size="sm"></b-form-select>
+                        <b-form-select :options="applications" @change="onApplicationChanged" text-field="name"
+                                       value-field="id" size="sm"></b-form-select>
                     </div>
                 </b-col>
             </b-row>
@@ -17,14 +18,26 @@
 </template>
 
 <script lang="ts">
-    import {Component, Vue} from "vue-property-decorator";
+    import {Component, Prop, Vue, Watch} from "vue-property-decorator";
+    import {mapGetters, mapState} from "vuex";
+    import {ApplicationModel} from "@/model/api-models";
 
-    @Component
+    @Component({
+        computed: {
+            ...mapState([
+                "applications"
+            ])
+        }
+    })
     export default class Header extends Vue {
-        applications = [
-            "pv-stats",
-            "another app"
-        ];
+        mounted(): void {
+            this.$store.dispatch("updateApplicationList")
+        }
+
+        onApplicationChanged(applicationId: number) {
+            if (applicationId)
+                this.$store.dispatch("setActiveApplication", applicationId)
+        }
     }
 </script>
 

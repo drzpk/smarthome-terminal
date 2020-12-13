@@ -1,6 +1,8 @@
 package dev.drzepka.smarthome.terminal.server.application.configuration
 
+import dev.drzepka.smarthome.terminal.server.application.converter.CategoryEntityToModelConverter
 import dev.drzepka.smarthome.terminal.server.application.converter.CategoryModelToEntityConverter
+import dev.drzepka.smarthome.terminal.server.application.converter.ClientEntityToModelConverter
 import dev.drzepka.smarthome.terminal.server.domain.converter.ConversionService
 import dev.drzepka.smarthome.terminal.server.domain.repository.ClientRepository
 import dev.drzepka.smarthome.terminal.server.domain.service.ClientService
@@ -22,6 +24,8 @@ val koinModule = module {
     single {
         val conversionService = ConversionService()
         conversionService.addConverter(CategoryModelToEntityConverter())
+        conversionService.addConverter(CategoryEntityToModelConverter())
+        conversionService.addConverter(ClientEntityToModelConverter())
         conversionService
     }
 

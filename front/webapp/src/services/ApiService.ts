@@ -1,20 +1,25 @@
-import {CategoryModel, ScreenModel} from "@/model/api-models";
-import Axios from "axios";
+import {ApplicationModel, CategoryModel, ScreenModel} from "@/model/api-models";
+import Axios, {AxiosResponse} from "axios";
 
 // todo: Add production url
-const API_URL = "http://192.168.3.196:8081/api";
+const API_URL = "http://localhost:8081/api";
 
 class ApiService {
 
-    getCategories(): Promise<Array<CategoryModel>> {
-        return Promise.resolve([
-            {id: 1, name: "name", "description": "desc"},
-            {id: 2, name: "name1", "description": "desc"},
-            {id: 3, name: "name2", "description": null}
-        ]);
+    getApplications(): Promise<Array<ApplicationModel>> {
+        return Axios.get(API_URL + "/applications").then((response: AxiosResponse<Array<ApplicationModel>>) => {
+           return response.data;
+        });
     }
-    getScreen(): Promise<ScreenModel> {
-        return Axios.get(API_URL + "/applications/1/categories/1/screen").then((response) => {
+
+    getCategories(applicationId: number): Promise<Array<CategoryModel>> {
+        return Axios.get(API_URL + `/applications/${applicationId}/categories`).then((response: AxiosResponse<Array<CategoryModel>>) => {
+          return response.data;
+        });
+    }
+
+    getScreen(applicationId: number, categoryId: number): Promise<ScreenModel> {
+        return Axios.get(API_URL + `/applications/${applicationId}/categories/${categoryId}/screen`).then((response) => {
             return response.data as ScreenModel
         });
     }
