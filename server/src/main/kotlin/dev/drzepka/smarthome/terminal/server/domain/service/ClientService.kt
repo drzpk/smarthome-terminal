@@ -5,9 +5,9 @@ import dev.drzepka.smarthome.terminal.common.transport.message.PingMessage
 import dev.drzepka.smarthome.terminal.common.util.Logger
 import dev.drzepka.smarthome.terminal.server.domain.Configuration
 import dev.drzepka.smarthome.terminal.server.domain.converter.ConversionService
-import dev.drzepka.smarthome.terminal.server.domain.value.Category
-import dev.drzepka.smarthome.terminal.server.domain.repository.ClientRepository
 import dev.drzepka.smarthome.terminal.server.domain.entity.Client
+import dev.drzepka.smarthome.terminal.server.domain.repository.ClientRepository
+import dev.drzepka.smarthome.terminal.server.domain.value.Category
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicInteger
@@ -67,7 +67,7 @@ class ClientService(
             val response = terminalQueue.putMessage(client, GetCategoriesMessage())
             val categories = response.categories.map { conversionService.convert<Category>(it) }
 
-            log.info("Downloaded {} for {}, updating the entity", categories.size, client)
+            log.info("Downloaded {} categories for {}, updating the entity", categories.size, client)
             client.categories = categories
         }
     }

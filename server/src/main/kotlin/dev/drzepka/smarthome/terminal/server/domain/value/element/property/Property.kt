@@ -1,7 +1,6 @@
-package dev.drzepka.smarthome.terminal.common.api.screen.element.property
+package dev.drzepka.smarthome.terminal.server.domain.value.element.property
 
-import dev.drzepka.smarthome.terminal.common.api.screen.element.Element
-
+import dev.drzepka.smarthome.terminal.server.domain.value.element.Element
 
 /**
  * Defines property that can be changed in terminal
@@ -13,4 +12,8 @@ abstract class Property<T>(val propertyType: String, val id: Int) : Element("pro
 
     var key: String? = null
         get() = field ?: title.replace(" ", "").toLowerCase()
+
+    fun validate() {
+
+    }
 }

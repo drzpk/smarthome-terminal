@@ -8,6 +8,8 @@ object MessageRegistry {
     init {
         registerMessage(PingMessage::class, PingMessageResponse::class)
         registerMessage(GetCategoriesMessage::class, GetCategoriesMessageResponse::class)
+        registerMessage(GetScreenMessage::class, GetScreenMessageResponse::class)
+        registerMessage(ScreenUpdateMessage::class, ScreenUpdateMessageResponse::class)
     }
 
     private fun registerMessage(

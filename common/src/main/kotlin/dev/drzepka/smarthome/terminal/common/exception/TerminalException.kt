@@ -1,6 +1,4 @@
-package dev.drzepka.smarthome.terminal.common.api.exception
-
-import java.lang.RuntimeException
+package dev.drzepka.smarthome.terminal.common.exception
 
 abstract class TerminalException : RuntimeException {
 

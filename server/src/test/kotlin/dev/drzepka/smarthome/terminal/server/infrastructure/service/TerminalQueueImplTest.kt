@@ -3,8 +3,8 @@ package dev.drzepka.smarthome.terminal.server.infrastructure.service
 import dev.drzepka.smarthome.terminal.common.transport.Side
 import dev.drzepka.smarthome.terminal.common.transport.message.Message
 import dev.drzepka.smarthome.terminal.common.transport.message.MessageResponse
-import dev.drzepka.smarthome.terminal.server.domain.service.TerminalQueue
 import dev.drzepka.smarthome.terminal.server.domain.entity.Client
+import dev.drzepka.smarthome.terminal.server.domain.service.TerminalQueue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.async
@@ -30,7 +30,7 @@ class TerminalQueueImplTest {
     fun `should process message from client`() = runBlockingTest {
         val testClient = Client(1, "")
         val message = TestMessage(Side.SERVER)
-        val queue = TerminalQueueImpl(handler, coroutineContext)
+        val queue = TerminalQueueImpl(handler)
         val result = async { queue.putMessage(testClient, message) }.asCompletableFuture().join()
 
         then(result.requestMessageId).isEqualTo(message.id)

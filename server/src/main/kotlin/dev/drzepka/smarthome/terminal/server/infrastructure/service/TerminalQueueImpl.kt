@@ -13,15 +13,19 @@ import kotlinx.coroutines.channels.sendBlocking
 import kotlinx.coroutines.future.asCompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
+import kotlin.coroutines.CoroutineContext
 
-class TerminalQueueImpl(handler: TerminalQueue.Handler) : TerminalQueue {
+class TerminalQueueImpl(
+    handler: TerminalQueue.Handler,
+    coroutineContext: CoroutineContext = Dispatchers.IO + SupervisorJob()
+) : TerminalQueue {
 
     override var handler: TerminalQueue.Handler? = null
 
     private val log by Logger()
     private val messageResponseTimeout = 3000L
 
-    private val coroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    private val coroutineScope = CoroutineScope(coroutineContext)
     private val clientDatas = ConcurrentHashMap<Int, ClientData>()
 
     init {

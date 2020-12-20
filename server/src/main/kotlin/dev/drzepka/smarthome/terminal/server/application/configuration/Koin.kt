@@ -3,12 +3,11 @@ package dev.drzepka.smarthome.terminal.server.application.configuration
 import dev.drzepka.smarthome.terminal.server.application.converter.CategoryEntityToModelConverter
 import dev.drzepka.smarthome.terminal.server.application.converter.CategoryModelToEntityConverter
 import dev.drzepka.smarthome.terminal.server.application.converter.ClientEntityToModelConverter
+import dev.drzepka.smarthome.terminal.server.application.converter.element.IntPropertyConverter
+import dev.drzepka.smarthome.terminal.server.application.converter.element.StringPropertyConverter
 import dev.drzepka.smarthome.terminal.server.domain.converter.ConversionService
 import dev.drzepka.smarthome.terminal.server.domain.repository.ClientRepository
-import dev.drzepka.smarthome.terminal.server.domain.service.ClientService
-import dev.drzepka.smarthome.terminal.server.domain.service.QueueHandler
-import dev.drzepka.smarthome.terminal.server.domain.service.Scheduler
-import dev.drzepka.smarthome.terminal.server.domain.service.TerminalQueue
+import dev.drzepka.smarthome.terminal.server.domain.service.*
 import dev.drzepka.smarthome.terminal.server.infrastructure.repository.InMemoryClientRepository
 import dev.drzepka.smarthome.terminal.server.infrastructure.service.InterfaceConfigurer
 import dev.drzepka.smarthome.terminal.server.infrastructure.service.SchedulerImpl
@@ -16,7 +15,11 @@ import dev.drzepka.smarthome.terminal.server.infrastructure.service.TerminalQueu
 import org.koin.dsl.module
 
 val koinModule = module {
+    // Service
     single { ClientService(get(), get(), get(), get()) }
+    single { ScreenService(get()) }
+
+    // Components
     single<TerminalQueue.Handler> { QueueHandler() }
     single<Scheduler> { SchedulerImpl() }
 
@@ -26,6 +29,8 @@ val koinModule = module {
         conversionService.addConverter(CategoryModelToEntityConverter())
         conversionService.addConverter(CategoryEntityToModelConverter())
         conversionService.addConverter(ClientEntityToModelConverter())
+        conversionService.addConverter(IntPropertyConverter())
+        conversionService.addConverter(StringPropertyConverter())
         conversionService
     }
 

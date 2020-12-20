@@ -2,17 +2,18 @@ package dev.drzepka.smarthome.terminal.server.application.configuration.routes
 
 import dev.drzepka.smarthome.terminal.common.api.category.CategoryModel
 import dev.drzepka.smarthome.terminal.common.api.clients.ClientModel
-import dev.drzepka.smarthome.terminal.common.api.screen.Screen
-import dev.drzepka.smarthome.terminal.common.api.screen.element.property.simple.StringProperty
 import dev.drzepka.smarthome.terminal.server.domain.converter.ConversionService
 import dev.drzepka.smarthome.terminal.server.domain.service.ClientService
+import dev.drzepka.smarthome.terminal.server.domain.service.ScreenService
 import io.ktor.application.*
+import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import org.koin.ktor.ext.get
 
 fun Route.applications() {
     val clientService = get<ClientService>()
+    val screenService = get<ScreenService>()
     val conversionService = get<ConversionService>()
 
     // Application = Client
@@ -38,13 +39,14 @@ fun Route.applications() {
                 }
 
                 get("/{categoryId}/screen") {
-                    val blankCategory = CategoryModel(1, "blank")
-                    val screen = Screen(1)
-                    screen.addElement(StringProperty(1))
-                    screen.addElement(StringProperty(2))
-                    screen.addElement(StringProperty(3))
+                    val clientId = call.parameters["id"]!!.toInt()
+                    val client = clientService.findClient(clientId)
 
-                    call.respond(screen)
+                    val screen = screenService.getScreen(client!!, call.parameters["categoryId"]!!.toInt())
+                    if (screen != null)
+                        call.respond(screen)
+                    else
+                        call.respond(HttpStatusCode.NotFound)
                 }
             }
         }

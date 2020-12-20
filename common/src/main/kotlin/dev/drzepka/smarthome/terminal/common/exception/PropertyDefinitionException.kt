@@ -1,3 +1,3 @@
-package dev.drzepka.smarthome.terminal.common.api.exception
+package dev.drzepka.smarthome.terminal.common.exception
 
 class PropertyDefinitionException(message: String) : TerminalException(message)

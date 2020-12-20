@@ -5,6 +5,7 @@ plugins {
 dependencies {
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
 
     compileOnly("com.fasterxml.jackson.core:jackson-databind:2.11.3")
     compileOnly("com.fasterxml.jackson.core:jackson-annotations:2.11.3")

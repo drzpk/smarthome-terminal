@@ -1,4 +1,4 @@
-package dev.drzepka.smarthome.terminal.common.api.screen.element
+package dev.drzepka.smarthome.terminal.server.domain.value.element
 
 /**
  * Defines a screen element
