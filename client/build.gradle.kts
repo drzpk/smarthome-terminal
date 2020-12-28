@@ -9,6 +9,7 @@ dependencies {
 
     implementation("io.ktor:ktor-client-apache:1.4.1")
     implementation("io.ktor:ktor-client-jackson:1.4.1")
+    implementation("io.ktor:ktor-client-auth:1.4.1")
 
     testImplementation(project(":common"))
     testImplementation("org.jetbrains.kotlin:kotlin-test")

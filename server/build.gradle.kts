@@ -5,10 +5,12 @@ plugins {
 dependencies {
     implementation(project(":common"))
 
+    // https://ktor.io/docs/artifacts.html
     val ktorVersion = "1.4.1"
 
     implementation("io.ktor:ktor-server-core:$ktorVersion")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
+    implementation("io.ktor:ktor-auth:$ktorVersion")
     implementation("io.ktor:ktor-jackson:$ktorVersion")
 
     implementation("org.koin:koin-ktor:2.1.6")

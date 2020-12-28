@@ -53,7 +53,7 @@ private class ScreenTestManager : ScreenManager("First screen", null) {
 }
 
 fun main() {
-    val client = TerminalClient("http://localhost:8081/api", ScreenTestClientManager())
+    val client = TerminalClient(TestCommons.getIdentity(), ScreenTestClientManager())
     client.register()
 
     // Keep the JVM alive

@@ -1,4 +1,4 @@
-package dev.drzepka.smarthome.terminal.server.domain.service
+package dev.drzepka.smarthome.terminal.server.domain.service.client
 
 import dev.drzepka.smarthome.terminal.common.transport.message.GetCategoriesMessage
 import dev.drzepka.smarthome.terminal.common.transport.message.PingMessage
@@ -7,17 +7,19 @@ import dev.drzepka.smarthome.terminal.server.domain.Configuration
 import dev.drzepka.smarthome.terminal.server.domain.converter.ConversionService
 import dev.drzepka.smarthome.terminal.server.domain.entity.Client
 import dev.drzepka.smarthome.terminal.server.domain.repository.ClientRepository
+import dev.drzepka.smarthome.terminal.server.domain.service.Scheduler
+import dev.drzepka.smarthome.terminal.server.domain.service.TerminalQueue
 import dev.drzepka.smarthome.terminal.server.domain.value.Category
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicInteger
 
-class ClientService(
+open class ClientServiceImpl(
     private val clientRepository: ClientRepository,
     private val terminalQueue: TerminalQueue,
     private val conversionService: ConversionService,
     scheduler: Scheduler
-) {
+) : ClientService {
 
     private val log by Logger()
 
@@ -29,7 +31,7 @@ class ClientService(
         }
     }
 
-    suspend fun findClient(id: Int): Client? {
+    override suspend fun findClient(id: Int): Client? {
         log.debug("Looking for client id={}", id)
         val client = clientRepository.findById(id) ?: return null
 
@@ -38,15 +40,25 @@ class ClientService(
         return client
     }
 
-    fun getAllClients(): Collection<Client> {
+    override suspend fun findClient(name: String, initialize: Boolean): Client? {
+        log.debug("Looking for client name='{}'", name)
+        val client = clientRepository.findAll().firstOrNull {it.name == name} ?: return null
+
+        log.debug("{} found", client)
+        if (initialize)
+            initializeClient(client)
+        return client
+    }
+
+    override fun getAllClients(): Collection<Client> {
         log.debug("Getting all clients")
         return clientRepository.findAll()
     }
 
-    fun registerClient(clientName: String, clientSecret: String): Client {
+    override fun registerClient(clientName: String): Client {
         log.info("Registering client {}", clientName)
         if (clientRepository.findByName(clientName) != null)
-            throw IllegalArgumentException("Client name=$clientName is already registered")
+            throw IllegalArgumentException("Client with name=$clientName is already registered")
 
         val nextId = clientIdCounter.incrementAndGet()
         val client = Client(nextId, clientName)
@@ -56,7 +68,7 @@ class ClientService(
         return client
     }
 
-    fun unregisterClient(client: Client) {
+    override fun unregisterClient(client: Client) {
         log.info("Unregistering {}", client)
         clientRepository.delete(client)
     }

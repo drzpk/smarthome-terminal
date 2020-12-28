@@ -22,7 +22,7 @@ class PingTestScreenManager : ScreenManager("Test screen", null) {
 }
 
 fun main(args: Array<String>) {
-    val client = TerminalClient("http://localhost:8081/api", PingTestClientManager())
+    val client = TerminalClient(TestCommons.getIdentity(), PingTestClientManager())
     client.register()
 
     // Keep the JVM alive

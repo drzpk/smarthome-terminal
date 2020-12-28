@@ -1,5 +1,6 @@
 package dev.drzepka.smarthome.terminal.client
 
+import dev.drzepka.smarthome.terminal.client.data.TerminalClientIdentity
 import dev.drzepka.smarthome.terminal.client.manager.ClientManager
 import dev.drzepka.smarthome.terminal.common.configurer.JacksonConfigurer
 import io.ktor.client.*
@@ -9,6 +10,7 @@ import io.ktor.client.features.json.*
 import io.ktor.http.*
 import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.Test
+import java.net.URL
 
 class TerminalClientTest {
 
@@ -18,7 +20,8 @@ class TerminalClientTest {
     @Test
     fun `should register and unregister client`() {
         val manager = TestManager()
-        val client = TestTerminalClient("http://localhost:8888", manager)
+        val identity = TerminalClientIdentity(URL("http://localhost:8888"), "user", "password")
+        val client = TestTerminalClient(identity, manager)
 
         client.register()
         then(registered).isTrue()
@@ -28,8 +31,8 @@ class TerminalClientTest {
         then(unregistered).isTrue()
     }
 
-    private inner class TestTerminalClient(terminalApiUrl: String, manager: ClientManager) :
-        TerminalClient(terminalApiUrl, manager) {
+    private inner class TestTerminalClient(identity: TerminalClientIdentity, manager: ClientManager) :
+        TerminalClient(identity, manager) {
         override fun createHttpClient(): HttpClient = HttpClient(MockEngine) {
             engine {
                 addHandler { request ->

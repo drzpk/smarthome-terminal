@@ -3,8 +3,8 @@ package dev.drzepka.smarthome.terminal.server.application.configuration.routes
 import dev.drzepka.smarthome.terminal.common.api.category.CategoryModel
 import dev.drzepka.smarthome.terminal.common.api.clients.ClientModel
 import dev.drzepka.smarthome.terminal.server.domain.converter.ConversionService
-import dev.drzepka.smarthome.terminal.server.domain.service.ClientService
 import dev.drzepka.smarthome.terminal.server.domain.service.ScreenService
+import dev.drzepka.smarthome.terminal.server.domain.service.client.ClientService
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.response.*

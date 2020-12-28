@@ -2,6 +2,7 @@ package dev.drzepka.smarthome.terminal.server.application.configuration.routes
 
 import dev.drzepka.smarthome.terminal.common.transport.message.Message
 import dev.drzepka.smarthome.terminal.common.transport.message.MessageResponse
+import dev.drzepka.smarthome.terminal.server.application.utils.requireAuthorizedPrincipal
 import dev.drzepka.smarthome.terminal.server.domain.entity.Client
 import dev.drzepka.smarthome.terminal.server.domain.repository.ClientRepository
 import dev.drzepka.smarthome.terminal.server.domain.service.TerminalQueue
@@ -22,21 +23,25 @@ fun Route.terminal() {
         return userRepository.findAll().firstOrNull() ?: testClient
     }
 
-    post("/terminal/queue") {
-        val message = call.receive<Message<out MessageResponse>>()
-        // todo: what if client sends message with target side: client?
-        val reply = queue.putMessage(getClient(), message)
-        call.respond(reply)
-    }
+    route("/terminal") {
+        requireAuthorizedPrincipal()
 
-    get("/terminal/queue/poll") {
-        val messages = queue.getQueuedMessages(getClient())
-        call.respond(messages)
-    }
+        post("/queue") {
+            val message = call.receive<Message<out MessageResponse>>()
+            // todo: what if client sends message with target side: client?
+            val reply = queue.putMessage(getClient(), message)
+            call.respond(reply)
+        }
 
-    put("/terminal/queue/poll") {
-        val reply = call.receive<MessageResponse>()
-        queue.provideResponses(getClient(), listOf(reply))
-        call.respondText("OK")
+        get("/queue/poll") {
+            val messages = queue.getQueuedMessages(getClient())
+            call.respond(messages)
+        }
+
+        put("/queue/poll") {
+            val reply = call.receive<MessageResponse>()
+            queue.provideResponses(getClient(), listOf(reply))
+            call.respondText("OK")
+        }
     }
 }

@@ -25,7 +25,7 @@ private class SecondCategoryScreen : ScreenManager("Second screen", "secound scr
 }
 
 fun main() {
-    val client = TerminalClient("http://localhost:8081/api", CategoriesTestClientManager())
+    val client = TerminalClient(TestCommons.getIdentity(), CategoriesTestClientManager())
     client.register()
 
     // Keep the JVM alive

@@ -1,35 +1,43 @@
 package dev.drzepka.smarthome.terminal.server.application.configuration.routes
 
-import dev.drzepka.smarthome.terminal.common.api.clients.RegisterClientRequest
 import dev.drzepka.smarthome.terminal.common.api.clients.RegisterClientResponse
-import dev.drzepka.smarthome.terminal.common.api.clients.UnregisterClientResponse
-import dev.drzepka.smarthome.terminal.server.domain.repository.ClientRepository
-import dev.drzepka.smarthome.terminal.server.domain.service.ClientService
+import dev.drzepka.smarthome.terminal.server.application.exception.NotFoundException
+import dev.drzepka.smarthome.terminal.server.application.utils.getApiClientPrincipal
+import dev.drzepka.smarthome.terminal.server.domain.service.client.ClientService
 import io.ktor.application.*
-import io.ktor.request.*
+import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import org.koin.ktor.ext.get
-import org.koin.ktor.ext.inject
+import org.slf4j.LoggerFactory
 
 fun Route.clients() {
+    val log = LoggerFactory.getLogger("ClientsRoute")
+
     route("/clients") {
         val clientService = get<ClientService>()
-        val clientRepository by inject<ClientRepository>()
-
-        // todo: implement session
 
         post("/register") {
-            val request = call.receive<RegisterClientRequest>()
-            val client = clientService.registerClient(request.clientName, request.clientSecret)
-            val response = RegisterClientResponse(true, client.id, "success", "not implemented yet")
+            val principal = getApiClientPrincipal()!!
+
+            val response = try {
+                val client = clientService.registerClient(principal.name)
+                RegisterClientResponse(true, client.id, "success")
+            } catch (e: Exception) {
+                log.error("Error while registering client with name='{}'", principal.name, e)
+                RegisterClientResponse(false, null, e.message)
+            }
             call.respond(response)
         }
 
         post("/unregister") {
-            clientRepository.findAll()
-                .forEach { clientService.unregisterClient(it) }
-            call.respond(UnregisterClientResponse())
+            val principal = getApiClientPrincipal()!!
+            if (principal.client != null) {
+                clientService.unregisterClient(principal.client)
+                call.respond(HttpStatusCode.NoContent)
+            } else {
+                throw NotFoundException("No client was registered")
+            }
         }
     }
 }

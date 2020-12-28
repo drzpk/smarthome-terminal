@@ -4,6 +4,7 @@ import com.nhaarman.mockitokotlin2.*
 import dev.drzepka.smarthome.terminal.common.transport.message.PingMessage
 import dev.drzepka.smarthome.terminal.server.application.converter.CategoryModelToEntityConverter
 import dev.drzepka.smarthome.terminal.server.domain.converter.ConversionService
+import dev.drzepka.smarthome.terminal.server.domain.service.client.ClientServiceImpl
 import dev.drzepka.smarthome.terminal.server.infrastructure.repository.InMemoryClientRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -28,7 +29,7 @@ class ClientServiceTest {
         }
 
         val service = getClientService(queue, scheduler)
-        val client = service.registerClient("name", "secret")
+        val client = service.registerClient("name")
         then(pingTask).overridingErrorMessage("ping task wasn't registered").isNotNull()
 
         //repeat(3) { delay(100) }
@@ -36,9 +37,14 @@ class ClientServiceTest {
         verify(queue, times(1)).putMessage(eq(client), any<PingMessage>())
     }
 
-    private fun getClientService(queue: TerminalQueue, scheduler: Scheduler): ClientService {
+    private fun getClientService(queue: TerminalQueue, scheduler: Scheduler): ClientServiceImpl {
         val conversionService = ConversionService()
         conversionService.addConverter(CategoryModelToEntityConverter())
-        return ClientService(InMemoryClientRepository(), queue, conversionService, scheduler)
+        return ClientServiceImpl(
+            InMemoryClientRepository(),
+            queue,
+            conversionService,
+            scheduler
+        )
     }
 }
