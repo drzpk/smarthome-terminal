@@ -5,14 +5,14 @@ import dev.drzepka.smarthome.terminal.server.application.converter.CategoryModel
 import dev.drzepka.smarthome.terminal.server.application.converter.ClientEntityToModelConverter
 import dev.drzepka.smarthome.terminal.server.application.converter.element.IntPropertyConverter
 import dev.drzepka.smarthome.terminal.server.application.converter.element.StringPropertyConverter
-import dev.drzepka.smarthome.terminal.server.application.service.ClientAuthenticationService
+import dev.drzepka.smarthome.terminal.server.application.service.ClientIdentityService
 import dev.drzepka.smarthome.terminal.server.domain.converter.ConversionService
 import dev.drzepka.smarthome.terminal.server.domain.repository.ClientRepository
 import dev.drzepka.smarthome.terminal.server.domain.service.*
 import dev.drzepka.smarthome.terminal.server.domain.service.client.ClientService
 import dev.drzepka.smarthome.terminal.server.domain.service.client.ClientServiceImpl
 import dev.drzepka.smarthome.terminal.server.infrastructure.repository.InMemoryClientRepository
-import dev.drzepka.smarthome.terminal.server.infrastructure.service.InterfaceConfigurer
+import dev.drzepka.smarthome.terminal.server.infrastructure.service.ClientAuthenticationService
 import dev.drzepka.smarthome.terminal.server.infrastructure.service.KtorEnvironmentService
 import dev.drzepka.smarthome.terminal.server.infrastructure.service.SchedulerImpl
 import dev.drzepka.smarthome.terminal.server.infrastructure.service.TerminalQueueImpl
@@ -20,11 +20,14 @@ import org.koin.dsl.module
 
 val koinModule = module {
     // Application service
-    single { ClientAuthenticationService(get(), get()) }
+    single { ClientIdentityService(get(), get()) }
 
     // Domain Service
     single<ClientService> { ClientServiceImpl(get(), get(), get(), get()) }
     single { ScreenService(get()) }
+
+    // Infrastructure service
+    single { ClientAuthenticationService(get()) }
 
     // Components
     single<TerminalQueue.Handler> { QueueHandler() }
@@ -47,6 +50,5 @@ val koinModule = module {
     // Infrastructure
     single<TerminalQueue> { TerminalQueueImpl(get()) }
     single<EnvironmentService> { KtorEnvironmentService() }
-    single { InterfaceConfigurer(get(), get()) }
 }
 

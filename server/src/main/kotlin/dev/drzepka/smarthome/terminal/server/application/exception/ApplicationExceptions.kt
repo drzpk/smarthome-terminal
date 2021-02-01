@@ -15,3 +15,16 @@ class NotFoundException : IdentifiableException {
     constructor(message: String) : super(message)
     constructor(message: String, cause: Throwable) : super(message, cause)
 }
+
+//class ValidationException : IdentifiableException { // todo: validation
+//    override val code = "validation"
+//    val errors = ArrayList<FieldError>()
+//
+//    constructor() : super("Request validation failed")
+//
+//    fun addFieldError(fieldName: String, errorMessage: String) {
+//        errors.add(FieldError(fieldName, errorMessage))
+//    }
+//
+//    data class FieldError(val fieldName: String, val errorMessage: String)
+//}

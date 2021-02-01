@@ -23,6 +23,4 @@ fun Application.setupFeatures() {
     install(CORS) {
         anyHost() // todo: debug mode only
     }
-
-
 }

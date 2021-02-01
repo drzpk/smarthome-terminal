@@ -39,11 +39,14 @@ class TerminalClientTest {
                     when (request.url.fullPath) {
                         "/clients/register" -> {
                             registered = true
-                            respond("{}", headers = headersOf("Content-Type", "application/json"))
+                            respond("""{"clientId":1,"apiKey":"abc"}""", headers = headersOf("Content-Type", "application/json"))
                         }
                         "/clients/unregister" -> {
                             unregistered = true
-                            respond("{}", headers = headersOf("Content-Type", "application/json"))
+                            respond("""{"clientId":1,"apiKey":"abc"}""", headers = headersOf("Content-Type", "application/json"))
+                        }
+                        "/terminal/queue/poll" -> {
+                            respond("""[]""", headers = headersOf("Content-Type", "application/json"))
                         }
                         else -> error("unhandled path: ${request.method} ${request.url.fullPath}")
                     }

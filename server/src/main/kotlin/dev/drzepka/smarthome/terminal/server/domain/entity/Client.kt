@@ -13,9 +13,9 @@ class Client(val id: Int, val name: String) {
             field = value
         }
 
-    private var lastPingTime = Instant.now()
+    var lastPingTime = Instant.now()
 
-    fun notifActive() {
+    fun notifyActive() {
         synchronized(this) {
             lastPingTime = Instant.now()
         }

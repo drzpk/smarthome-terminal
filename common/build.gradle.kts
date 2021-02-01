@@ -11,6 +11,7 @@ dependencies {
     compileOnly("com.fasterxml.jackson.core:jackson-annotations:2.11.3")
     compileOnly("com.fasterxml.jackson.module:jackson-module-kotlin:2.11.3")
     compileOnly("org.slf4j:slf4j-api:1.7.30")
+    implementation("javax.validation:validation-api:2.0.1.Final")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
@@ -19,6 +20,7 @@ dependencies {
     testImplementation("com.fasterxml.jackson.core:jackson-annotations:2.11.3")
     testImplementation("org.assertj:assertj-core:3.8.0")
     testImplementation("io.ktor:ktor-client-mock:1.4.1")
+    testImplementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.11.3")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.4.2")
 }
 

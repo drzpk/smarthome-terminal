@@ -1,10 +1,10 @@
 package dev.drzepka.smarthome.terminal.server.application.utils
 
-import dev.drzepka.smarthome.terminal.server.application.data.ApiClientPrincipal
-import dev.drzepka.smarthome.terminal.server.application.data.PrincipalContainer
-import dev.drzepka.smarthome.terminal.server.application.data.TerminalPrincipal
 import dev.drzepka.smarthome.terminal.server.application.exception.AccessForbiddenException
 import dev.drzepka.smarthome.terminal.server.domain.entity.Client
+import dev.drzepka.smarthome.terminal.server.infrastructure.security.ApiClientPrincipal
+import dev.drzepka.smarthome.terminal.server.infrastructure.security.PrincipalContainer
+import dev.drzepka.smarthome.terminal.server.infrastructure.security.TerminalPrincipal
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.routing.*

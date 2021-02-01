@@ -6,7 +6,8 @@ object MessageRegistry {
     val messages = ArrayList<MessageEntry>()
 
     init {
-        registerMessage(PingMessage::class, PingMessageResponse::class)
+        registerMessage(PingClientMessage::class, PingClientMessageResponse::class)
+        registerMessage(PingServerMessage::class, PingServerMessageResponse::class)
         registerMessage(GetCategoriesMessage::class, GetCategoriesMessageResponse::class)
         registerMessage(GetScreenMessage::class, GetScreenMessageResponse::class)
         registerMessage(ScreenUpdateMessage::class, ScreenUpdateMessageResponse::class)

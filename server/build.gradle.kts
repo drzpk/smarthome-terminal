@@ -15,6 +15,7 @@ dependencies {
 
     implementation("org.koin:koin-ktor:2.1.6")
     implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.14.0")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.11.3")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")

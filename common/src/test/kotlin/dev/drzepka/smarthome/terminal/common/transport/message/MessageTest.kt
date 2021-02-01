@@ -10,14 +10,14 @@ import java.util.regex.Pattern
 class MessageTest {
 
     private val serializedPingMessage =
-        Pattern.compile("""\[\{"@type":"PingMessage","id":\d+,"receiverSide":"CLIENT"}]""")
+        Pattern.compile("""\[\{"@type":"PingClientMessage","id":\d+,"receiverSide":"CLIENT"}]""")
     private val serializedPingMessageResponse =
-        Pattern.compile("""\[\{"@type":"PingMessageResponse","requestMessageId":\d+}]""")
+        Pattern.compile("""\[\{"@type":"PingClientMessageResponse","requestMessageId":\d+}]""")
 
 
     @Test
     fun `should serialize message`() {
-        val message = PingMessage()
+        val message = PingClientMessage()
         val objectMapper = getObjectMapper()
 
         val serialized = objectMapper.writeValueAsString(MessageList(listOf(message)))
@@ -26,7 +26,7 @@ class MessageTest {
 
     @Test
     fun `should serialize message response`() {
-        val response = PingMessageResponse(PingMessage())
+        val response = PingClientMessageResponse(PingClientMessage())
         val objectMapper = getObjectMapper()
 
         val serialized = objectMapper.writeValueAsString(MessageResponseList(listOf(response)))
@@ -35,25 +35,25 @@ class MessageTest {
 
     @Test
     fun `should deserialize message`() {
-        val serialized = """[{"@type":"PingMessage","id":23469963625500,"receiverSide":"CLIENT"}]"""
+        val serialized = """[{"@type":"PingClientMessage","id":23469963625500,"receiverSide":"CLIENT"}]"""
         val objectMapper = getObjectMapper()
 
         val deserialized = objectMapper.readValue(serialized, MessageList::class.java)
         val item = deserialized.first()
 
-        then(item).isInstanceOf(PingMessage::class.java)
+        then(item).isInstanceOf(PingClientMessage::class.java)
         then(item.id).isEqualTo(23469963625500L)
         then(item.receiverSide).isEqualTo(Side.CLIENT)
     }
 
     @Test
     fun `should deserialize message response`() {
-        val serialized = """{"@type":"PingMessageResponse","requestMessageId":23469963625500}"""
+        val serialized = """{"@type":"PingServerMessageResponse","requestMessageId":23469963625500}"""
         val objectMapper = getObjectMapper()
 
-        val deserialized = objectMapper.readValue(serialized, PingMessageResponse::class.java)
+        val deserialized = objectMapper.readValue(serialized, PingServerMessageResponse::class.java)
 
-        then(deserialized).isInstanceOf(PingMessageResponse::class.java)
+        then(deserialized).isInstanceOf(PingServerMessageResponse::class.java)
         then(deserialized.requestMessageId).isEqualTo(23469963625500L)
     }
 

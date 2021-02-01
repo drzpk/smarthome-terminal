@@ -10,9 +10,9 @@ import io.ktor.routing.*
 
 fun Application.setupRouting() {
     routing {
-        authenticate(Security.SERVER_AUTH_NAME) {
-            route("/api") {
-                clients()
+        route("/api") {
+            clients()
+            authenticate(Security.AUTH_PROVIDER_CLIENT_API) {
                 terminal()
             }
         }

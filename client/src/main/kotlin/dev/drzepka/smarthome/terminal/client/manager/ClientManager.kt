@@ -60,7 +60,7 @@ abstract class ClientManager : TerminalQueue.Handler, IdSpace {
             log.trace("Processing message: ${message.javaClass.simpleName}")
 
         return when (message) {
-            is PingMessage -> processPingMessage(message) as Response
+            is PingClientMessage -> processPingMessage(message) as Response
             is GetCategoriesMessage -> processGetCategoriesMessage(message) as Response
             is GetScreenMessage -> processGetScreenMessage(message) as Response
             is ScreenUpdateMessage -> processScreenUpdateMessage(message) as Response
@@ -68,8 +68,8 @@ abstract class ClientManager : TerminalQueue.Handler, IdSpace {
         }
     }
 
-    private fun processPingMessage(message: PingMessage): PingMessageResponse {
-        return PingMessageResponse(message)
+    private fun processPingMessage(message: PingClientMessage): PingClientMessageResponse {
+        return PingClientMessageResponse(message)
     }
 
     private fun processGetCategoriesMessage(message: GetCategoriesMessage): GetCategoriesMessageResponse {

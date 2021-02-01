@@ -6,7 +6,12 @@ import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
 class Logger : ReadOnlyProperty<Any, Logger> {
+
+    private var logger: Logger? = null
+
     override fun getValue(thisRef: Any, property: KProperty<*>): Logger {
-        return LoggerFactory.getLogger(thisRef.javaClass)
+        if (logger == null)
+            logger = LoggerFactory.getLogger(thisRef.javaClass)
+        return logger!!
     }
 }

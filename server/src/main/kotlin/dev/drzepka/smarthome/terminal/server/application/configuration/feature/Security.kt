@@ -1,8 +1,9 @@
 package dev.drzepka.smarthome.terminal.server.application.configuration.feature
 
 import dev.drzepka.smarthome.terminal.common.util.Logger
-import dev.drzepka.smarthome.terminal.server.application.data.PrincipalContainer
-import dev.drzepka.smarthome.terminal.server.application.service.ClientAuthenticationService
+import dev.drzepka.smarthome.terminal.server.application.service.ClientIdentityService
+import dev.drzepka.smarthome.terminal.server.infrastructure.security.PrincipalContainer
+import dev.drzepka.smarthome.terminal.server.infrastructure.security.apiKey
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.features.*
@@ -11,21 +12,21 @@ import org.koin.ktor.ext.get
 
 object Security {
 
-    const val SERVER_AUTH_NAME = "serverAuthentication"
+    const val AUTH_PROVIDER_CLIENT_API = "client_api"
 
     private val log by Logger()
 
     fun install(application: Application) {
-        val clientAuthenticationService = application.get<ClientAuthenticationService>()
+        val clientIdentityService = application.get<ClientIdentityService>()
 
         application.install(Authentication) {
-            basic(SERVER_AUTH_NAME) {
-                realm = "Terminal Server"
+            apiKey(AUTH_PROVIDER_CLIENT_API) {
                 validate { credentials ->
-                    val principal = clientAuthenticationService.getPrincipal(credentials)
+                    val principal = clientIdentityService.getPrincipal(credentials)
                     if (principal == null)
                         notifyUnauthorizedAccess(request)
-                    PrincipalContainer(principal!!)
+
+                    principal?.let { PrincipalContainer(it) }
                 }
             }
         }

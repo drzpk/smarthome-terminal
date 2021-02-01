@@ -1,10 +1,15 @@
 package dev.drzepka.smarthome.terminal.server.application.configuration.routes
 
+import dev.drzepka.smarthome.terminal.common.api.clients.RegisterClientRequest
 import dev.drzepka.smarthome.terminal.common.api.clients.RegisterClientResponse
-import dev.drzepka.smarthome.terminal.server.application.exception.NotFoundException
+import dev.drzepka.smarthome.terminal.server.application.configuration.feature.Security
+import dev.drzepka.smarthome.terminal.server.application.exception.AccessForbiddenException
+import dev.drzepka.smarthome.terminal.server.application.service.ClientIdentityService
 import dev.drzepka.smarthome.terminal.server.application.utils.getApiClientPrincipal
-import dev.drzepka.smarthome.terminal.server.domain.service.client.ClientService
+import dev.drzepka.smarthome.terminal.server.application.utils.getRequestBody
+import dev.drzepka.smarthome.terminal.server.domain.exception.IdentifiableException
 import io.ktor.application.*
+import io.ktor.auth.*
 import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.routing.*
@@ -15,28 +20,33 @@ fun Route.clients() {
     val log = LoggerFactory.getLogger("ClientsRoute")
 
     route("/clients") {
-        val clientService = get<ClientService>()
+        val clientIdentityService = get<ClientIdentityService>()
 
         post("/register") {
-            val principal = getApiClientPrincipal()!!
-
+            val request = getRequestBody<RegisterClientRequest>()
             val response = try {
-                val client = clientService.registerClient(principal.name)
-                RegisterClientResponse(true, client.id, "success")
+                val principal = clientIdentityService.authenticateApiClient(request.name!!, request.password!!)
+                if (principal != null)
+                    RegisterClientResponse(principal.client!!.id, principal.apiKey)
+                else
+                    null
             } catch (e: Exception) {
-                log.error("Error while registering client with name='{}'", principal.name, e)
-                RegisterClientResponse(false, null, e.message)
+                log.error("Error while registering client with name='{}'", request.name, e)
+                if (e is IdentifiableException)
+                    throw e
+                else
+                    throw AccessForbiddenException("Error during client registration")
             }
+                ?: throw AccessForbiddenException("Invalid credentials")
+
             call.respond(response)
         }
 
-        post("/unregister") {
-            val principal = getApiClientPrincipal()!!
-            if (principal.client != null) {
-                clientService.unregisterClient(principal.client)
+        authenticate(Security.AUTH_PROVIDER_CLIENT_API) {
+            post("/unregister") {
+                val principal = getApiClientPrincipal()!!
+                clientIdentityService.deauthenticateApiClient(principal)
                 call.respond(HttpStatusCode.NoContent)
-            } else {
-                throw NotFoundException("No client was registered")
             }
         }
     }

@@ -5,8 +5,8 @@ import dev.drzepka.smarthome.terminal.common.configurer.JacksonConfigurer
 import dev.drzepka.smarthome.terminal.common.transport.Side
 import dev.drzepka.smarthome.terminal.common.transport.message.Message
 import dev.drzepka.smarthome.terminal.common.transport.message.MessageResponse
-import dev.drzepka.smarthome.terminal.common.transport.message.PingMessage
-import dev.drzepka.smarthome.terminal.common.transport.message.PingMessageResponse
+import dev.drzepka.smarthome.terminal.common.transport.message.PingClientMessage
+import dev.drzepka.smarthome.terminal.common.transport.message.PingClientMessageResponse
 import io.ktor.client.*
 import io.ktor.client.engine.mock.*
 import io.ktor.client.features.*
@@ -29,7 +29,7 @@ class ClientHttpTerminalQueueTest {
             counter.addAndGet(1)
             if (request.url.fullPath == "/api/terminal/queue/poll")
                 respond(
-                    """[{"@type":"PingMessage","id":23469963625500,"receiverSide":"CLIENT"}]""",
+                    """[{"@type":"PingClientMessage","id":23469963625500,"receiverSide":"CLIENT"}]""",
                     headers = headersOf("Content-Type", "application/json")
                 )
             else
@@ -105,7 +105,7 @@ class ClientHttpTerminalQueueTest {
             if (request.url.fullPath == "/api/terminal/queue/poll" && request.method == HttpMethod.Get) {
                 requestReceived = true
                 respond(
-                    """[{"@type":"PingMessage","id":23469963625500,"receiverSide":"CLIENT"}]""",
+                    """[{"@type":"PingClientMessage","id":23469963625500,"receiverSide":"CLIENT"}]""",
                     headers = headersOf("Content-Type", "application/json")
                 )
             } else if (request.url.fullPath == "/api/terminal/queue/poll" && request.method == HttpMethod.Put) {
@@ -121,7 +121,7 @@ class ClientHttpTerminalQueueTest {
             @Suppress("UNCHECKED_CAST")
             override fun <Response : MessageResponse> processMessage(message: Message<Response>): Response {
                 handlerInvoked = true
-                return PingMessageResponse(message as PingMessage) as Response
+                return PingClientMessageResponse(message as PingClientMessage) as Response
             }
         }
 

@@ -11,8 +11,6 @@ import dev.drzepka.smarthome.terminal.common.util.Logger
 import io.ktor.client.*
 import io.ktor.client.engine.apache.*
 import io.ktor.client.features.*
-import io.ktor.client.features.auth.*
-import io.ktor.client.features.auth.providers.*
 import io.ktor.client.features.json.*
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -23,18 +21,25 @@ import kotlin.concurrent.thread
 open class TerminalClient(private val identity: TerminalClientIdentity, private val clientManager: ClientManager) {
 
     private val log by Logger()
-    private val httpClient by lazy { createHttpClient() }
+
+    private lateinit var httpClient: HttpClient
+    private var apiKey: String? = null
 
     /**
      * Registers this client in the terminal server.
      */
-    fun register() {
+    fun register() { // todo: 403 errors after registration should trigger re-registration
+        // Reset HTTP client so it doesn't contain authorization
+        apiKey = null
+        httpClient = createHttpClient()
+
         log.info("Registering terminal client {}", clientManager.clientName)
         runBlocking {
             doRegister()
         }
 
         createShutdownHook()
+        httpClient = createHttpClient()
         clientManager.initialize(httpClient, identity.apiUrl.toString())
     }
 
@@ -53,13 +58,14 @@ open class TerminalClient(private val identity: TerminalClientIdentity, private 
     }
 
     open fun createHttpClient(): HttpClient = HttpClient(Apache) {
-        install(Auth) {
-            basic {
-                username = identity.name
-                password = identity.password
-                sendWithoutRequest = true
+        if (apiKey != null) {
+            defaultRequest {
+                headers {
+                    set("Authorization", "Bearer $apiKey")
+                }
             }
         }
+
         install(JsonFeature) {
             serializer = JacksonSerializer {
                 JacksonConfigurer.configure(this)
@@ -89,12 +95,13 @@ open class TerminalClient(private val identity: TerminalClientIdentity, private 
 
         log.info("Client registered with id {}", response!!.clientId)
         log.debug("Full response: {}", response)
+        apiKey = response.apiKey
     }
 
     private suspend fun tryToRegister(): RegisterClientResponse {
         return httpClient.post("${identity.apiUrl}/clients/register") {
             contentType(ContentType.Application.Json)
-            body = RegisterClientRequest()
+            body = RegisterClientRequest(identity.name, identity.password)
         }
     }
 

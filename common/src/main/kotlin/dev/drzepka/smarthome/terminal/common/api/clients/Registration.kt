@@ -1,11 +1,13 @@
 package dev.drzepka.smarthome.terminal.common.api.clients
 
-class RegisterClientRequest
+data class RegisterClientRequest(
+    var name: String?,
+    var password: String?
+)
 
 data class RegisterClientResponse(
-    var status: Boolean,
-    var clientId: Int?,
-    var message: String?
+    var clientId: Int,
+    var apiKey: String
 )
 
 class UnregisterClientRequest
