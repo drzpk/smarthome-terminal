@@ -1,25 +1,31 @@
 <template>
     <div id="screen">
-        <h3>This is a screen</h3>
-        <div id="element-container">
-
+        <div id="screen-content" v-if="screen != null">
+            <h3>{{category.name}}</h3>
+            <div id="tree-container">
+                <b-form name="screen-form" novalidate>
+                    <ElementTree :root-node="screen"></ElementTree>
+                </b-form>
+            </div>
         </div>
     </div>
 </template>
 
 <script lang="ts">
     import {Component, Vue} from "vue-property-decorator";
+    import {mapState} from "vuex";
+    import ElementTree from "@/components/ElementTree.vue";
 
     @Component({
-        computed: {
-            screen() {
-                return this.$store.state.screen;
-            }
+        components: {
+            ElementTree
         },
+        computed: mapState([
+            "category",
+            "screen"
+        ]),
         data() {
-            return {
-
-            }
+            return {}
         }
     })
     export default class Screen extends Vue {

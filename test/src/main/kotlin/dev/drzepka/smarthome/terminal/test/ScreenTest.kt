@@ -31,13 +31,16 @@ private class ScreenTestManager : ScreenManager("First screen", null) {
     override fun getScreen(): ScreenModel {
         return screen(this) {
             firstName = stringProperty {
-
+                label = "First name"
+                value = "initial value"
             }
             lastName = stringProperty {
-
+                label = "Last name"
+                required = true
             }
             age = intProperty {
-
+                label = "Age"
+                value = 10
             }
         }
     }

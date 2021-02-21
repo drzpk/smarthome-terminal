@@ -1,5 +1,5 @@
 <template>
-    <div class="category">
+    <div class="category" @click="selectCategory">
         <span></span>
         <div class="category-content">
             <p>{{categoryModel.name}}</p>
@@ -16,6 +16,10 @@
     export default class Category extends Vue {
         @Prop(Object)
         categoryModel!: CategoryModel;
+
+        selectCategory() {
+            this.$store.dispatch("displayScreenForCategory", this.categoryModel)
+        }
     }
 </script>
 
@@ -25,6 +29,7 @@
     .category {
         border-bottom: 1px solid $border-color-primary;
         overflow: auto;
+        cursor: pointer;
 
         &:last-child {
             border-bottom: none;

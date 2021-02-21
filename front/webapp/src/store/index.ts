@@ -60,11 +60,13 @@ export default new Vuex.Store({
             });
         },
 
-        setActiveCategory: function (context, category: CategoryModel) {
+        displayScreenForCategory: function (context, category: CategoryModel) {
             console.debug(`Setting active category to ${category}`);
+            context.commit("setActiveCategory", category);
+
             const currentApplication = context.state.application as unknown as ApplicationModel;
             ApiService.getScreen(currentApplication.id, category.id).then((screen) => {
-                context.commit("setScreen", screen);
+                context.commit("setActiveScreen", screen);
             });
         }
     },

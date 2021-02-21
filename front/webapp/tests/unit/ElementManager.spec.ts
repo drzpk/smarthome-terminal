@@ -1,4 +1,4 @@
-import StringProperty from "@/components/elements/properties/StringProperty.vue";
+import StringProperty from "@/components/elements/properties/simple/StringProperty.vue";
 import ElementManager from "@/services/ElementManager";
 
 describe("ElementResolver", () => {
@@ -17,6 +17,6 @@ describe("ElementResolver", () => {
             elementType: "property",
             propertyType: "i don't exist"
         };
-        expect(manager.resolveComponentName(definition)).toBeUndefined();
+        expect(() => manager.resolveComponentName(definition)).toThrow(/Component wasn't found for selector.*/);
     });
 });

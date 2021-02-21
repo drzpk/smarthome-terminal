@@ -1,7 +1,5 @@
 import {Vue} from "vue-property-decorator";
-import StringProperty from "@/components/elements/properties/StringProperty.vue";
-import {Component} from "vue";
-import {Element, ElementDefinition} from "@/model/Element";
+import {ElementDefinition, Elements} from "@/model/Elements";
 
 interface TreeNode {
     selector?: string;
@@ -16,9 +14,11 @@ const elementTree: TreeNode = {
             selector: "propertyType",
             children: {
                 "string": {
-                    element: Element.STRING_PROPERTY
+                    element: Elements.STRING_PROPERTY
                 },
-                "int": {}
+                "int": {
+                    element: Elements.INT_PROPERTY
+                }
             }
         }
     }
@@ -26,17 +26,17 @@ const elementTree: TreeNode = {
 
 class ElementManager {
     registerElementComponents() {
-        Object.entries(Element).forEach((entry) => {
+        Object.entries(Elements).forEach((entry) => {
             const definition = entry[1] as ElementDefinition;
             Vue.component(definition.vueComponentName, definition.vueComponent);
         });
     }
 
-    resolveComponentName(definition: object): string | undefined {
+    resolveComponentName(definition: object): string {
         return this.doResolveComponentName(definition, elementTree);
     }
 
-    private doResolveComponentName(definition: any, node: TreeNode): string | undefined {
+    private doResolveComponentName(definition: any, node: TreeNode): string {
         ElementManager.verifyNode(node);
         if (node.selector! in definition) {
             const value = definition[node.selector!];
@@ -48,7 +48,7 @@ class ElementManager {
             return node.element!.vueComponentName;
         }
 
-        return undefined;
+        throw `Component wasn't found for selector ${node.selector} and value ${definition[node.selector!]}`;
     }
 
     private static verifyNode(node: TreeNode) {

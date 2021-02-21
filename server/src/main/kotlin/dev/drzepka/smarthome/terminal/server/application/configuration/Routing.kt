@@ -15,8 +15,8 @@ fun Application.setupRouting() {
             authenticate(Security.AUTH_PROVIDER_CLIENT_API) {
                 terminal()
             }
-        }
 
-        applications()
+            applications()
+        }
     }
 }
