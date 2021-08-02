@@ -1,8 +1,7 @@
 import {ApplicationModel, CategoryModel, ScreenModel} from "@/model/api-models";
 import Axios, {AxiosResponse} from "axios";
 
-// todo: Add production url
-const API_URL = "http://localhost:8081/api";
+const API_URL = "http://localhost:8080/api";
 
 class ApiService {
 
