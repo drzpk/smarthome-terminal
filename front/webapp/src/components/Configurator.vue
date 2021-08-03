@@ -12,12 +12,12 @@
 </template>
 
 <script lang="ts">
-    import {Component, Vue} from "vue-property-decorator";
-    import Categories from "@/components/Categories.vue";
-    import Screen from "@/components/Screen.vue";
-    import {mapState} from "vuex";
+import {Component, Vue} from "vue-property-decorator";
+import Categories from "@/components/Categories.vue";
+import Screen from "@/components/Screen.vue";
+import {mapState} from "vuex";
 
-    @Component({
+@Component({
         components: {
             Categories,
             Screen
@@ -33,7 +33,7 @@
 </script>
 
 <style lang="scss" scoped>
-    @import "../styles/colors";
+    @import "../styles/_variables";
 
     #container {
         border: 1px solid $border-color-primary;

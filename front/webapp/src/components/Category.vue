@@ -9,10 +9,10 @@
 </template>
 
 <script lang="ts">
-    import {Component, Prop, Vue} from "vue-property-decorator";
-    import {CategoryModel} from "@/model/api-models";
+import {Component, Prop, Vue} from "vue-property-decorator";
+import {CategoryModel} from "@/model/api-models";
 
-    @Component
+@Component
     export default class Category extends Vue {
         @Prop(Object)
         categoryModel!: CategoryModel;
@@ -24,7 +24,7 @@
 </script>
 
 <style lang="scss">
-    @import "../styles/colors";
+    @import "../styles/_variables";
 
     .category {
         border-bottom: 1px solid $border-color-primary;

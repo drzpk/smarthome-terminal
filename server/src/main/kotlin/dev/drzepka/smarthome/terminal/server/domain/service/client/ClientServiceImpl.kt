@@ -5,8 +5,10 @@ import dev.drzepka.smarthome.terminal.common.util.Logger
 import dev.drzepka.smarthome.terminal.server.domain.Configuration
 import dev.drzepka.smarthome.terminal.server.domain.converter.ConversionService
 import dev.drzepka.smarthome.terminal.server.domain.entity.Client
+import dev.drzepka.smarthome.terminal.server.domain.event.ClientUnregisteredEvent
 import dev.drzepka.smarthome.terminal.server.domain.exception.ClientAlreadyRegisteredException
 import dev.drzepka.smarthome.terminal.server.domain.repository.ClientRepository
+import dev.drzepka.smarthome.terminal.server.domain.service.EventService
 import dev.drzepka.smarthome.terminal.server.domain.service.Scheduler
 import dev.drzepka.smarthome.terminal.server.domain.service.TerminalQueue
 import dev.drzepka.smarthome.terminal.server.domain.value.Category
@@ -16,6 +18,7 @@ open class ClientServiceImpl(
     private val clientRepository: ClientRepository,
     private val terminalQueue: TerminalQueue,
     private val conversionService: ConversionService,
+    private val eventService: EventService,
     scheduler: Scheduler
 ) : ClientService {
 
@@ -70,6 +73,7 @@ open class ClientServiceImpl(
     override fun unregisterClient(client: Client) {
         log.info("Unregistering {}", client)
         clientRepository.delete(client)
+        eventService.publish(ClientUnregisteredEvent(client))
     }
 
     private suspend fun initializeClient(client: Client) {

@@ -11,7 +11,7 @@ abstract class Element(val elementType: String) {
             field = value
         }
 
-    private val children = ArrayList<Element>()
+    val children = ArrayList<Element>()
 
     fun addChild(child: Element) {
         children.add(child)

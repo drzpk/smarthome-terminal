@@ -2,15 +2,15 @@
 <template>
     <div class="property">
         <label for="int-input">{{model.label}}:</label>
-        <b-form-input id="int-input" type="number" :placeholder="model.label"></b-form-input>
+        <b-form-input id="int-input" type="number" :placeholder="model.label" v-model="value" @change="valueChanged()"></b-form-input>
     </div>
 </template>
 
 <script lang="ts">
-    import {Component} from "vue-property-decorator";
-    import VueProperty from '@/model/property/VueProperty';
+import {Component} from "vue-property-decorator";
+import VueProperty from '@/model/property/VueProperty';
 
-    @Component({})
+@Component({})
     export default class IntProperty extends VueProperty<number> {
 
         deserialize(input: string | null): number | null {

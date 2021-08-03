@@ -5,6 +5,7 @@ import io.ktor.application.*
 import org.koin.core.context.KoinContext
 
 // todo: this won't work, koin can't return all registered beans
+// todo: try this: https://github.com/InsertKoinIO/koin/issues/146#issuecomment-477309412
 class InterfaceConfigurer(private val koinContext: KoinContext, private val application: Application) {
 
     init {

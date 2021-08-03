@@ -20,7 +20,4 @@ fun Application.setupFeatures() {
             JacksonConfigurer.configure(this)
         }
     }
-    install(CORS) {
-        anyHost() // todo: debug mode only
-    }
 }

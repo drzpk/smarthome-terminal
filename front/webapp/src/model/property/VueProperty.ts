@@ -1,7 +1,8 @@
-import {Component, Prop, Vue} from "vue-property-decorator";
+import {Component, Prop, Vue, Watch} from "vue-property-decorator";
 import {PropertyModel} from "@/model/api-models";
 import {Validator, Validators} from "@/model/property/validators";
 import {NotImplementedError} from "@/model/errors";
+import {ScreenMutationTypes} from "@/store/screen";
 
 interface Validation {
     isValid: boolean;
@@ -34,6 +35,17 @@ export default class VueProperty<T> extends Vue {
         this.value = this.deserialize(this.model.value);
 
         this.addValidator(Validators.required);
+        this.getValidators().forEach((validator) => this.addValidator(validator));
+        this.validate();
+    }
+
+    @Watch("serverError")
+    private onServerErrorChanged(): void {
+        this.validate();
+    }
+
+    getValidators(): Array<Validator> {
+        return [];
     }
 
     deserialize(input: string | null): T | null {
@@ -50,21 +62,52 @@ export default class VueProperty<T> extends Vue {
     }
 
     valueChanged() {
-        for (const validator of this.validation.validators) {
-            const result = validator.validate(this.value);
-            if (!result) {
-                this.validation.isValid = false;
-                this.validation.state = false;
-                this.validation.validationErrorMessage = validator.getErrorMessage(this.model.label, this.value);
-                return;
-            }
-        }
-
-        this.validation.isValid = true;
-        this.validation.state = null;
-        this.validation.validationErrorMessage = null;
+        this.clearServerError();
+        if (!this.validate())
+            return;
 
         // Performance isn't important at this stage so just serialize the value every time it's changed
         this.model.value = this.serialize(this.value);
+    }
+
+    private validate(): boolean {
+        const validationErrorMessage = this.getValidationErrorMessage();
+
+        this.validation.isValid = validationErrorMessage == null;
+        this.validation.state = this.validation.isValid ? null : false;
+        this.validation.validationErrorMessage = validationErrorMessage;
+
+        this.updatePropertyModel();
+        return true;
+    }
+
+    private getValidationErrorMessage(): string | null {
+        if (this.serverError != null) {
+            return this.serverError;
+        }
+
+        let message: string | null = null;
+        for (const validator of this.validation.validators) {
+            const result = validator.validate(this.value);
+            if (!result) {
+                message = validator.getErrorMessage(this.model.label, this.value);
+                break;
+            }
+        }
+
+        return message;
+    }
+
+    private clearServerError(): void {
+        if (this.serverError != null)
+            this.$store.commit(ScreenMutationTypes.CLEAR_SERVER_ERROR, this.model.id);
+    }
+
+    private get serverError(): string | null {
+        return this.$store.getters.getServerError(this.model.id);
+    }
+
+    private updatePropertyModel() {
+        this.model.isValid = this.validation.isValid;
     }
 }

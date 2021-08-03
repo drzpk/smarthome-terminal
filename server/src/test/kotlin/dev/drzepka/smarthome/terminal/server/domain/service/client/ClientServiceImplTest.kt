@@ -8,7 +8,9 @@ import dev.drzepka.smarthome.terminal.server.application.converter.CategoryModel
 import dev.drzepka.smarthome.terminal.server.domain.Configuration
 import dev.drzepka.smarthome.terminal.server.domain.converter.ConversionService
 import dev.drzepka.smarthome.terminal.server.domain.entity.Client
+import dev.drzepka.smarthome.terminal.server.domain.event.ClientUnregisteredEvent
 import dev.drzepka.smarthome.terminal.server.domain.repository.ClientRepository
+import dev.drzepka.smarthome.terminal.server.domain.service.EventService
 import dev.drzepka.smarthome.terminal.server.domain.service.Scheduler
 import dev.drzepka.smarthome.terminal.server.domain.service.TerminalQueue
 import dev.drzepka.smarthome.terminal.server.infrastructure.repository.InMemoryClientRepository
@@ -26,10 +28,12 @@ import java.time.Instant
 class ClientServiceImplTest {
 
     private lateinit var clientRepository: ClientRepository
+    private lateinit var eventService: EventService
 
     @BeforeEach
     fun prepare() {
         clientRepository = InMemoryClientRepository()
+        eventService = mock { }
     }
 
     @Test
@@ -76,6 +80,7 @@ class ClientServiceImplTest {
         scheduler.handler.invoke(this)
 
         then(clientRepository.findAll().isEmpty()).isTrue()
+        verify(eventService, times(1)).publish(any<ClientUnregisteredEvent>())
     }
 
     private fun getService(queue: TerminalQueue, scheduler: Scheduler): ClientServiceImpl {
@@ -85,6 +90,7 @@ class ClientServiceImplTest {
             clientRepository,
             queue,
             conversionService,
+            eventService,
             scheduler
         )
     }

@@ -1,12 +1,20 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import ApiService from "@/services/ApiService";
-import {ApplicationModel, CategoryModel} from "@/model/api-models";
+import {ApplicationModel, CategoryModel, ScreenModel} from "@/model/api-models";
+import {ScreenModule} from './screen';
 
 Vue.use(Vuex);
 
+export interface RootState {
+    applications: ApplicationModel[];
+    categories: CategoryModel[];
+    application: ApplicationModel | null;
+    category: CategoryModel | null;
+    screen: ScreenModel | null;
+}
 
-export default new Vuex.Store({
+export default new Vuex.Store<RootState>({
     state: {
         applications: [],
         categories: [],
@@ -70,5 +78,8 @@ export default new Vuex.Store({
             });
         }
     },
-    modules: {}
+
+    modules: {
+        ScreenModule
+    }
 })

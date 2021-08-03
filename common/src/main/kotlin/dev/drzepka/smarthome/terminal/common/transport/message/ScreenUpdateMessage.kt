@@ -7,7 +7,7 @@ import dev.drzepka.smarthome.terminal.common.transport.Side
  */
 class ScreenUpdateMessage : Message<ScreenUpdateMessageResponse>(Side.CLIENT, ScreenUpdateMessageResponse::class) {
     var screenId = 0
-    var propertyValues = HashMap<Int, String>()
+    var propertyValues = emptyMap<Int, String?>()
 }
 
 class ScreenUpdateMessageResponse : MessageResponse {

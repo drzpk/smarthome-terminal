@@ -2,25 +2,31 @@
     <div id="screen">
         <div id="screen-content" v-if="screen != null">
             <h3>{{category.name}}</h3>
-            <div id="tree-container">
-                <b-form name="screen-form" novalidate>
+            <b-form name="screen-form" novalidate>
+                <div id="tree-container">
                     <ElementTree :root-node="screen"></ElementTree>
-                </b-form>
-            </div>
+                </div>
+
+                <b-button class="send-button" variant="outline-primary" @click="updateScreen()">Save</b-button>
+            </b-form>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-    import {Component, Vue} from "vue-property-decorator";
-    import {mapState} from "vuex";
-    import ElementTree from "@/components/ElementTree.vue";
+import {Component, Vue} from "vue-property-decorator";
+import {mapState} from "vuex";
+import ElementTree from "@/components/ElementTree.vue";
+import {ApplicationModel, CategoryModel, ElementModel, PropertyModel, ScreenModel} from "@/model/api-models";
+import ApiService from "@/services/ApiService";
+import ScreenProcessingResponseHandler from "@/services/ScreenProcessingResponseHandler";
 
-    @Component({
+@Component({
         components: {
             ElementTree
         },
         computed: mapState([
+            "application",
             "category",
             "screen"
         ]),
@@ -29,6 +35,58 @@
         }
     })
     export default class Screen extends Vue {
+        private application!: ApplicationModel;
+        private category!: CategoryModel;
+        private screen!: ScreenModel;
+
+        private $bvToast: any;
+
+        updateScreen() {
+            if (!this.arePropertiesValid()) {
+                this.$bvToast.toast("Cannot perform screen update - there are validation errors", {
+                    title: "Validation error",
+                    variant: "danger"
+                });
+                return;
+            }
+
+            // todo: spinner when waiting for server response
+            ApiService.updateScreen(this.application.id, this.category.id, this.serializeProperties()).then(response => {
+                ScreenProcessingResponseHandler.handle(response);
+            });
+        }
+
+        private arePropertiesValid(root: ElementModel = this.screen): boolean {
+            if (root.elementType === "property") {
+                const property = root as PropertyModel;
+                if (property.isValid === undefined)
+                    console.warn(`Validation flag for property ${property.id} ("${property.label}") is undefined`);
+
+                return (property).isValid || false;
+            } else {
+                for (const child of root.children) {
+                    if (!this.arePropertiesValid(child))
+                        return false;
+                }
+                return true;
+            }
+        }
+
+        private serializeProperties(): Map<number, string | null> {
+            const queue: Array<ElementModel> = [this.screen];
+            const map = new Map<number, string | null>();
+
+            while (queue.length > 0) {
+                const item = queue.shift()!;
+                if (item.elementType === "property") {
+                    map.set(item.id, (item as PropertyModel).value)
+                }
+
+                queue.push(...item.children);
+            }
+
+            return map;
+        }
 
     }
 </script>
@@ -37,5 +95,9 @@
     #screen {
         min-height: 500px;
         border: 1px solid red;
+    }
+
+    .send-button {
+        float: right;
     }
 </style>
