@@ -10,6 +10,8 @@ import store from './store'
 
 import './styles/_root.scss'
 
+import './directives/ShowLoader'
+
 
 Vue.config.productionTip = false;
 Vue.use(VueAxios, axios);

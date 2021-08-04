@@ -18,7 +18,7 @@ import {CategoryModel} from "@/model/api-models";
         categoryModel!: CategoryModel;
 
         selectCategory() {
-            this.$store.dispatch("displayScreenForCategory", this.categoryModel)
+            this.$store.dispatch("setActiveCategory", this.categoryModel)
         }
     }
 </script>

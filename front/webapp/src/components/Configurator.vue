@@ -4,7 +4,7 @@
       <b-col cols="3" id="category-container">
         <Categories></Categories>
       </b-col>
-      <b-col cols="9" id="screen-container">
+      <b-col cols="9" id="screen-container" v-show-loader="screenLoading">
         <Screen></Screen>
       </b-col>
     </b-row>
@@ -15,7 +15,7 @@
 import {Component, Vue} from "vue-property-decorator";
 import Categories from "@/components/Categories.vue";
 import Screen from "@/components/Screen.vue";
-import {mapState} from "vuex";
+import {mapGetters, mapState} from "vuex";
 
 @Component({
   components: {
@@ -25,10 +25,14 @@ import {mapState} from "vuex";
   computed: {
     ...mapState([
       "application"
+    ]),
+    ...mapGetters([
+      "screenLoading"
     ])
   }
 })
 export default class Configurator extends Vue {
+  screenLoading!: boolean;
 }
 </script>
 

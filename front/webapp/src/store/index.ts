@@ -1,8 +1,8 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import ApiService from "@/services/ApiService";
-import {ApplicationModel, CategoryModel, ScreenModel} from "@/model/api-models";
-import {ScreenModule} from './screen';
+import {ApplicationModel, CategoryModel} from "@/model/api-models";
+import {ScreenActionTypes, ScreenModule} from './screen';
 
 Vue.use(Vuex);
 
@@ -11,7 +11,6 @@ export interface RootState {
     categories: CategoryModel[];
     application: ApplicationModel | null;
     category: CategoryModel | null;
-    screen: ScreenModel | null;
 }
 
 export default new Vuex.Store<RootState>({
@@ -19,8 +18,7 @@ export default new Vuex.Store<RootState>({
         applications: [],
         categories: [],
         application: null,
-        category: null,
-        screen: null
+        category: null
     },
     getters: {
         getApplicationById(state) {
@@ -41,9 +39,6 @@ export default new Vuex.Store<RootState>({
         },
         setActiveCategory(state, category) {
             state.category = category;
-        },
-        setActiveScreen(state, screen) {
-            state.screen = screen;
         }
     },
     actions: {
@@ -68,14 +63,11 @@ export default new Vuex.Store<RootState>({
             });
         },
 
-        displayScreenForCategory: function (context, category: CategoryModel) {
+        setActiveCategory: function (context, category: CategoryModel) {
             console.debug(`Setting active category to ${category}`);
             context.commit("setActiveCategory", category);
 
-            const currentApplication = context.state.application as unknown as ApplicationModel;
-            ApiService.getScreen(currentApplication.id, category.id).then((screen) => {
-                context.commit("setActiveScreen", screen);
-            });
+            context.dispatch(ScreenActionTypes.SET_ACTIVE_SCREEN, category.id);
         }
     },
 

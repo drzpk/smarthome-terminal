@@ -17,7 +17,7 @@
 
 <script lang="ts">
 import {Component, Vue} from "vue-property-decorator";
-import {mapState} from "vuex";
+import {mapGetters, mapState} from "vuex";
 import ElementTree from "@/components/ElementTree.vue";
 import {ApplicationModel, CategoryModel, ElementModel, PropertyModel, ScreenModel} from "@/model/api-models";
 import ApiService from "@/services/ApiService";
@@ -27,11 +27,15 @@ import ScreenProcessingResponseHandler from "@/services/ScreenProcessingResponse
   components: {
     ElementTree
   },
-  computed: mapState([
-    "application",
-    "category",
-    "screen"
-  ]),
+  computed: {
+    ...mapState([
+      "application",
+      "category",
+    ]),
+    ...mapGetters([
+        "screen"
+    ])
+  },
   data() {
     return {}
   }
