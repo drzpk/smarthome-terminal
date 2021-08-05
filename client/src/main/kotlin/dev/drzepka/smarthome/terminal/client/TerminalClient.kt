@@ -2,6 +2,7 @@ package dev.drzepka.smarthome.terminal.client
 
 import dev.drzepka.smarthome.terminal.client.data.TerminalClientIdentity
 import dev.drzepka.smarthome.terminal.client.manager.ClientManager
+import dev.drzepka.smarthome.terminal.client.transport.queue.ClientHttpTerminalQueue
 import dev.drzepka.smarthome.terminal.common.api.clients.RegisterClientRequest
 import dev.drzepka.smarthome.terminal.common.api.clients.RegisterClientResponse
 import dev.drzepka.smarthome.terminal.common.api.clients.UnregisterClientRequest
@@ -14,21 +15,22 @@ import io.ktor.client.features.*
 import io.ktor.client.features.json.*
 import io.ktor.client.request.*
 import io.ktor.http.*
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import kotlin.concurrent.thread
 
 open class TerminalClient(private val identity: TerminalClientIdentity, private val clientManager: ClientManager) {
 
     private val log by Logger()
+    private val coroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     private lateinit var httpClient: HttpClient
+    private lateinit var terminalQueue: ClientHttpTerminalQueue
     private var apiKey: String? = null
 
     /**
      * Registers this client in the terminal server.
      */
-    fun register() { // todo: 403 errors after registration should trigger re-registration
+    fun register() {
         // Reset HTTP client so it doesn't contain authorization
         apiKey = null
         httpClient = createHttpClient()
@@ -40,7 +42,11 @@ open class TerminalClient(private val identity: TerminalClientIdentity, private 
 
         createShutdownHook()
         httpClient = createHttpClient()
-        clientManager.initialize(httpClient, identity.apiUrl.toString())
+
+        terminalQueue = ClientHttpTerminalQueue(httpClient, identity.apiUrl.toString(), coroutineScope, clientManager)
+        terminalQueue.start(this::onQueueStopped)
+
+        clientManager.initialize()
     }
 
     /**
@@ -48,6 +54,8 @@ open class TerminalClient(private val identity: TerminalClientIdentity, private 
      */
     fun unregister() {
         log.info("Unregistering terminal client {}", clientManager.clientName)
+        terminalQueue.stop()
+
         runBlocking {
             try {
                 doUnregister()
@@ -117,5 +125,15 @@ open class TerminalClient(private val identity: TerminalClientIdentity, private 
             clientManager.destroy()
             unregister()
         })
+    }
+
+    private fun onQueueStopped(stopException: Exception?) {
+        if (stopException == null) {
+            // Queue was stopped normally
+            return
+        }
+
+        log.error("Queue was stopped abnormally, terminal client will be recreated", stopException)
+        register()
     }
 }

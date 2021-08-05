@@ -13,13 +13,17 @@ import io.ktor.client.features.*
 import io.ktor.client.features.json.*
 import io.ktor.client.request.*
 import io.ktor.http.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runBlockingTest
 import org.assertj.core.api.BDDAssertions.assertThatExceptionOfType
 import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.Test
+import java.net.SocketException
 import java.util.concurrent.atomic.AtomicInteger
 
+@ExperimentalCoroutinesApi
 class ClientHttpTerminalQueueTest {
 
     @Test
@@ -46,7 +50,6 @@ class ClientHttpTerminalQueueTest {
         then(counter.get()).isGreaterThanOrEqualTo(2)
 
         queue.stop()
-        Unit
     }
 
     @Test
@@ -89,8 +92,8 @@ class ClientHttpTerminalQueueTest {
         // Queue doesn't need to be started - polling isn't tested here
         queue.putMessage(TestMessage(Side.SERVER))
 
-        then(requestSent).isTrue()
-        then(handlerInvoked).isFalse()
+        then(requestSent).isTrue
+        then(handlerInvoked).isFalse
 
         Unit
     }
@@ -128,12 +131,33 @@ class ClientHttpTerminalQueueTest {
         queue.start()
         delay(50)
 
-        then(requestReceived).isTrue()
-        then(requestSent).isTrue()
-        then(handlerInvoked).isTrue()
+        then(requestReceived).isTrue
+        then(requestSent).isTrue
+        then(handlerInvoked).isTrue
 
         queue.stop()
-        Unit
+    }
+
+    @Test
+    fun `should handle SocketExceptions`() = runBlockingTest {
+        val testException = SocketException("Test exception")
+        val httpClient = createHttpClient { throw testException }
+
+        val queue = ClientHttpTerminalQueue(httpClient, "/api", this, null, 50, pollErrorMaxDurationMs = 20)
+
+        var listenerException: Exception? = null
+        queue.start {
+            listenerException = it
+        }
+
+        pauseDispatcher {
+            repeat(10) {
+                delay(15)
+            }
+        }
+
+        then(listenerException!!.javaClass).isEqualTo(testException.javaClass)
+        then(listenerException!!.message).isEqualTo(testException.message)
     }
 
     private fun createHttpClient(handler: MockRequestHandleScope.(request: HttpRequestData) -> HttpResponseData?): HttpClient =

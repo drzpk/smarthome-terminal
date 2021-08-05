@@ -14,6 +14,9 @@ import io.ktor.http.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.net.SocketException
+import java.time.Duration
+import java.time.Instant
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -24,7 +27,9 @@ class ClientHttpTerminalQueue(
     terminalApiUrl: String,
     private val coroutineScope: CoroutineScope,
     override var handler: TerminalQueue.Handler?,
-    private val pollIntervalMs: Long = 1000L
+    private val pollIntervalMs: Long = 1000L,
+    /** Maximum time to wait for server to come online if it's unavailable. The counter resets after first normal response from the server. */
+    private val pollErrorMaxDurationMs: Long = -1
 ) : TerminalQueue {
 
     private val log by Logger()
@@ -32,20 +37,20 @@ class ClientHttpTerminalQueue(
     private val serverPollQueueUrl = "$terminalApiUrl/terminal/queue/poll"
 
     private var working = AtomicBoolean(false)
+    private var queueStopListener: ((e: Exception?) -> Unit)? = null
+    private var firstErrorTime: Instant? = null
 
-    fun start() {
+    fun start(stopListener: ((e: Exception?) -> Unit)? = null) {
         if (!working.get()) {
             log.info("Starting the queue")
             working.set(true)
+            queueStopListener = stopListener
             startPolling()
         }
     }
 
     fun stop() {
-        if (working.get()) {
-            log.info("Stopping the queue")
-            working.set(false)
-        }
+        doStop(null)
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -71,11 +76,19 @@ class ClientHttpTerminalQueue(
     private fun startPolling() {
         coroutineScope.launch {
             while (working.get()) {
-                log.trace("Polling terminal queue for messages")
-                val response = httpClient.get<MessageList>(serverPollQueueUrl)
-                log.trace("Received ${response.size} messages")
-                response.forEach { handleMessageFromServer(it) }
-                delay(pollIntervalMs)
+                try {
+                    log.trace("Polling terminal queue for messages")
+                    val response = httpClient.get<MessageList>(serverPollQueueUrl)
+                    log.trace("Received ${response.size} messages")
+                    response.forEach { handleMessageFromServer(it) }
+
+                    firstErrorTime = null
+                    delay(pollIntervalMs)
+                } catch (e: Exception) {
+                    val continueWorking = handlePollingException(e)
+                    if (!continueWorking)
+                        break
+                }
             }
         }
     }
@@ -86,6 +99,46 @@ class ClientHttpTerminalQueue(
                 contentType(ContentType.Application.Json)
                 body = messageResponse
             }
+        }
+    }
+
+    private suspend fun handlePollingException(e: Exception): Boolean {
+        if (e is SocketException) {
+            val errorTimeWasNull = firstErrorTime == null
+            if (errorTimeWasNull) {
+                log.error("Error in poll routine", e)
+                firstErrorTime = Instant.now()
+            } else {
+                log.error("Error in poll routine: {}", e.message)
+            }
+
+            val duration = Duration.between(firstErrorTime, Instant.now()).toMillis()
+            val maxTimeExceeded = pollErrorMaxDurationMs in 1 until duration
+
+            if (!errorTimeWasNull && !maxTimeExceeded) {
+                val timeToWait = 3000L
+                log.info("Waitining {}ms before retrying", timeToWait)
+                delay(timeToWait)
+            }
+
+            if (maxTimeExceeded) {
+                log.error("Maximum poll error duration ({}) has been exceeded ({}), stopping the queue", pollErrorMaxDurationMs, duration)
+                doStop(e)
+                return false
+            }
+        } else {
+            doStop(e)
+            return false
+        }
+
+        return true
+    }
+
+    private fun doStop(exception: Exception?) {
+        if (working.get()) {
+            log.info("Stopping the queue")
+            working.set(false)
+            queueStopListener?.invoke(exception)
         }
     }
 }
