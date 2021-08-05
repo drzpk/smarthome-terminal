@@ -79,7 +79,25 @@ class ClientServiceImplTest {
         getService(queue, scheduler)
         scheduler.handler.invoke(this)
 
-        then(clientRepository.findAll().isEmpty()).isTrue()
+        then(clientRepository.findAll().isEmpty()).isTrue
+        verify(eventService, times(1)).publish(any<ClientUnregisteredEvent>())
+    }
+
+    @Test
+    fun `should re-register client if it's already registered`() {
+        val queue = mock<TerminalQueue> {}
+        val scheduler = mock<Scheduler> {}
+        val service = getService(queue, scheduler)
+
+        service.registerClient("clientName")
+        val registered1 = clientRepository.findByName("clientName")
+        then(registered1).isNotNull
+        verify(eventService, times(0)).publish(any<ClientUnregisteredEvent>())
+
+        service.registerClient("clientName")
+        val registered2 = clientRepository.findByName("clientName")
+        then(registered2).isNotNull
+        then(registered2!!.id).isNotEqualTo(registered1!!.id)
         verify(eventService, times(1)).publish(any<ClientUnregisteredEvent>())
     }
 

@@ -6,7 +6,6 @@ import dev.drzepka.smarthome.terminal.server.domain.Configuration
 import dev.drzepka.smarthome.terminal.server.domain.converter.ConversionService
 import dev.drzepka.smarthome.terminal.server.domain.entity.Client
 import dev.drzepka.smarthome.terminal.server.domain.event.ClientUnregisteredEvent
-import dev.drzepka.smarthome.terminal.server.domain.exception.ClientAlreadyRegisteredException
 import dev.drzepka.smarthome.terminal.server.domain.repository.ClientRepository
 import dev.drzepka.smarthome.terminal.server.domain.service.EventService
 import dev.drzepka.smarthome.terminal.server.domain.service.Scheduler
@@ -58,8 +57,11 @@ open class ClientServiceImpl(
 
     override fun registerClient(clientName: String): Client {
         log.info("Registering client {}", clientName)
-        clientRepository.findByName(clientName)?.apply {
-            throw ClientAlreadyRegisteredException(this)
+
+        val registered = clientRepository.findByName(clientName)
+        if (registered != null) {
+            log.info("Client with name {} is already registered and will be unregistered")
+            unregisterClient(registered)
         }
 
         val nextId = clientIdCounter.incrementAndGet()
