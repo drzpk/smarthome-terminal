@@ -4,7 +4,8 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import dev.drzepka.smarthome.terminal.common.api.element.ScreenModel
 import dev.drzepka.smarthome.terminal.common.api.screen.ProcessScreenUpdateRequest
-import dev.drzepka.smarthome.terminal.common.api.screen.ProcessScreenUpdateResponse
+import dev.drzepka.smarthome.terminal.common.api.screen.response.ScreenUpdatedResponse
+import dev.drzepka.smarthome.terminal.common.api.screen.response.ScreenValidationErrorResponse
 import dev.drzepka.smarthome.terminal.common.transport.message.GetScreenMessage
 import dev.drzepka.smarthome.terminal.common.transport.message.GetScreenMessageResponse
 import dev.drzepka.smarthome.terminal.common.transport.message.ScreenUpdateMessage
@@ -74,8 +75,7 @@ class ScreenServiceTest {
 
         val response = getService().processUpdate(client, request)
 
-        then(response.status).isEqualTo(ProcessScreenUpdateResponse.Status.UPDATED)
-        then(response.errors).isNull()
+        then(response).isInstanceOf(ScreenUpdatedResponse::class.java)
         then(property.value).isEqualTo("string value")
     }
 
@@ -94,10 +94,11 @@ class ScreenServiceTest {
         )
 
         val response = getService().processUpdate(client, request)
+        then(response).isInstanceOf(ScreenValidationErrorResponse::class.java)
 
-        then(response.status).isEqualTo(ProcessScreenUpdateResponse.Status.VALIDATION_ERROR)
-        then(response.errors).hasSize(1)
-        then(response.errors?.get(30)).isEqualTo("Minimum length is 10.")
+        val errorResponse = response as ScreenValidationErrorResponse
+        then(errorResponse.errors).hasSize(1)
+        then(errorResponse.errors?.get(30)).isEqualTo("Minimum length is 10.")
     }
 
     private fun getService(): ScreenService {

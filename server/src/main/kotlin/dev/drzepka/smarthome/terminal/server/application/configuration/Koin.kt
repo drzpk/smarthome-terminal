@@ -8,6 +8,7 @@ import dev.drzepka.smarthome.terminal.server.application.converter.element.prope
 import dev.drzepka.smarthome.terminal.server.application.converter.element.property.simple.StringPropertyConverter
 import dev.drzepka.smarthome.terminal.server.application.service.ClientIdentityService
 import dev.drzepka.smarthome.terminal.server.domain.converter.ConversionService
+import dev.drzepka.smarthome.terminal.server.domain.converter.ScreenUpdateMessageToResponseConverter
 import dev.drzepka.smarthome.terminal.server.domain.repository.ClientRepository
 import dev.drzepka.smarthome.terminal.server.domain.repository.ScreenRepository
 import dev.drzepka.smarthome.terminal.server.domain.service.*
@@ -41,9 +42,13 @@ val koinModule = module {
         conversionService.addConverter(CategoryModelToEntityConverter())
         conversionService.addConverter(CategoryEntityToModelConverter())
         conversionService.addConverter(ClientEntityToModelConverter())
+
         conversionService.addConverter(ScreenConverter(conversionService))
         conversionService.addConverter(IntPropertyConverter())
         conversionService.addConverter(StringPropertyConverter())
+
+        conversionService.addConverter(ScreenUpdateMessageToResponseConverter())
+
         conversionService
     }
 

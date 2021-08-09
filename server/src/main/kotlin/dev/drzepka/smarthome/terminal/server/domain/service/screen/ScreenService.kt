@@ -2,7 +2,9 @@ package dev.drzepka.smarthome.terminal.server.domain.service.screen
 
 import dev.drzepka.smarthome.terminal.common.api.element.ScreenModel
 import dev.drzepka.smarthome.terminal.common.api.screen.ProcessScreenUpdateRequest
-import dev.drzepka.smarthome.terminal.common.api.screen.ProcessScreenUpdateResponse
+import dev.drzepka.smarthome.terminal.common.api.screen.response.ProcessScreenUpdateResponse
+import dev.drzepka.smarthome.terminal.common.api.screen.response.ScreenUpdateErrorResponse
+import dev.drzepka.smarthome.terminal.common.api.screen.response.ScreenValidationErrorResponse
 import dev.drzepka.smarthome.terminal.common.transport.message.GetScreenMessage
 import dev.drzepka.smarthome.terminal.common.transport.message.ScreenUpdateMessage
 import dev.drzepka.smarthome.terminal.common.util.Logger
@@ -58,8 +60,7 @@ class ScreenService(
 
         val validationErrors = setElementProperties(screen, request.properties)
         if (validationErrors.isNotEmpty()) {
-            val response = ProcessScreenUpdateResponse()
-            response.status = ProcessScreenUpdateResponse.Status.VALIDATION_ERROR
+            val response = ScreenValidationErrorResponse()
             response.errors = validationErrors.associateBy({ error -> error.propertyId }, { error -> error.message })
             return response
         }
@@ -106,19 +107,15 @@ class ScreenService(
         message.screenId = screen.id
         message.propertyValues = properties
 
-        val response = ProcessScreenUpdateResponse()
-
-        try {
+        return try {
             val messageResponse = terminalQueue.putMessage(client, message)
-            response.status = ProcessScreenUpdateResponse.Status.valueOf(messageResponse.status.name)
-            response.message = messageResponse.message
+            conversionService.convert(messageResponse)
         } catch (e: Exception) {
             log.error("Error while processing screen update message for {}", client, e)
-            response.status = ProcessScreenUpdateResponse.Status.ERROR
+            val response = ScreenUpdateErrorResponse()
             response.message = "Error while processing screen update"
+            response
         }
-
-        return response
     }
 
 }

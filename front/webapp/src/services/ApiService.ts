@@ -1,12 +1,7 @@
-import {
-    ApplicationModel,
-    CategoryModel,
-    ProcessScreenUpdateRequest,
-    ProcessScreenUpdateResponse,
-    ScreenModel
-} from "@/model/api-models";
+import {ApplicationModel, CategoryModel, ScreenModel} from "@/model/api/api-models";
 
 import Axios, {AxiosResponse} from "axios";
+import {ProcessScreenUpdateRequest, ProcessScreenUpdateResponse} from "@/model/api/screen-update";
 
 const API_URL = "http://localhost:8080/api";
 

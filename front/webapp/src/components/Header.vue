@@ -18,11 +18,10 @@
 </template>
 
 <script lang="ts">
-    import {Component, Prop, Vue, Watch} from "vue-property-decorator";
-    import {mapGetters, mapState} from "vuex";
-    import {ApplicationModel} from "@/model/api-models";
+import {Component, Vue} from "vue-property-decorator";
+import {mapState} from "vuex";
 
-    @Component({
+@Component({
         computed: {
             ...mapState([
                 "applications"

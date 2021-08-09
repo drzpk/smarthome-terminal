@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import ApiService from "@/services/ApiService";
-import {ApplicationModel, CategoryModel} from "@/model/api-models";
+import {ApplicationModel, CategoryModel} from "@/model/api/api-models";
 import {ScreenActionTypes, ScreenModule} from './screen';
 
 Vue.use(Vuex);

@@ -1,6 +1,6 @@
 import {ActionContext, ActionTree, GetterTree, Module, MutationTree} from 'vuex'
 import {RootState} from "@/store/index";
-import {ApplicationModel, ScreenModel} from "@/model/api-models";
+import {ApplicationModel, ScreenModel} from "@/model/api/api-models";
 import ApiService from "@/services/ApiService";
 
 export interface ScreenState {

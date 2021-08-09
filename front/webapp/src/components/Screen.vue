@@ -19,7 +19,7 @@
 import {Component, Vue} from "vue-property-decorator";
 import {mapGetters, mapState} from "vuex";
 import ElementTree from "@/components/ElementTree.vue";
-import {ApplicationModel, CategoryModel, ElementModel, PropertyModel, ScreenModel} from "@/model/api-models";
+import {ApplicationModel, CategoryModel, ElementModel, PropertyModel, ScreenModel} from "@/model/api/api-models";
 import ApiService from "@/services/ApiService";
 import ScreenProcessingResponseHandler from "@/services/ScreenProcessingResponseHandler";
 

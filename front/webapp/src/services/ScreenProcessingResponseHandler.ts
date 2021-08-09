@@ -1,4 +1,10 @@
-import {ProcessScreenUpdateResponse, ScreenUpdateStatus} from "@/model/api-models";
+import {
+    ProcessScreenUpdateResponse,
+    ScreenUpdatedResponse,
+    ScreenUpdateErrorResponse,
+    ScreenUpdateStatus,
+    ScreenValidationErrorResponse
+} from "@/model/api/screen-update";
 import store from '@/store/index';
 import {ScreenMutationTypes} from "@/store/screen";
 
@@ -7,34 +13,27 @@ class ScreenProcessingResponseHandler {
     handle(response: ProcessScreenUpdateResponse): void {
         switch (response.status) {
             case ScreenUpdateStatus.UPDATED:
-                this.handleUpdated();
+                this.handleUpdated(response);
                 break;
             case ScreenUpdateStatus.VALIDATION_ERROR:
-                ScreenProcessingResponseHandler.handleValidationError(response.errors!);
+                ScreenProcessingResponseHandler.handleValidationError(response);
                 break;
             case ScreenUpdateStatus.ERROR:
-                this.handleError();
+                this.handleError(response);
                 break;
-            case ScreenUpdateStatus.UNKNOWN:
-                this.handleUnknown();
-                break;
-
         }
     }
 
-    private handleUpdated(): void {
+    private handleUpdated(response: ScreenUpdatedResponse): void {
         // todo
+        console.log("update successful");
     }
 
-    private static handleValidationError(errors: Map<number, string>): void {
-        store.commit(ScreenMutationTypes.SET_SERVER_ERRORS, errors);
+    private static handleValidationError(response: ScreenValidationErrorResponse): void {
+        store.commit(ScreenMutationTypes.SET_SERVER_ERRORS, response.errors);
     }
 
-    private handleError(): void {
-        // todo
-    }
-
-    private handleUnknown(): void {
+    private handleError(response: ScreenUpdateErrorResponse): void {
         // todo
     }
 }

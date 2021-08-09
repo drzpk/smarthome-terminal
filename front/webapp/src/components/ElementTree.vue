@@ -4,11 +4,11 @@
     </div>
 </template>
 <script lang="ts">
-    import {Component, Prop, Vue} from "vue-property-decorator";
-    import {ScreenModel} from "@/model/api-models";
-    import ElementManager from "@/services/ElementManager";
+import {Component, Prop, Vue} from "vue-property-decorator";
+import {ScreenModel} from "@/model/api/api-models";
+import ElementManager from "@/services/ElementManager";
 
-    @Component({})
+@Component({})
     export default class ElementTree extends Vue {
         @Prop(Object)
         rootNode!: ScreenModel;

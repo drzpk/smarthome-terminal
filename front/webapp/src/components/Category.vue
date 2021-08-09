@@ -10,7 +10,7 @@
 
 <script lang="ts">
 import {Component, Prop, Vue} from "vue-property-decorator";
-import {CategoryModel} from "@/model/api-models";
+import {CategoryModel} from "@/model/api/api-models";
 
 @Component
     export default class Category extends Vue {

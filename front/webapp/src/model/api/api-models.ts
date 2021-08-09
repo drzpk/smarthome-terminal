@@ -30,22 +30,3 @@ export interface PropertyModel extends ElementModel {
     // Fields used by the client side only
     isValid?: boolean;
 }
-
-export interface ProcessScreenUpdateRequest {
-    screenId: number;
-    properties: { [p: string]: string | null };
-}
-
-export interface ProcessScreenUpdateResponse {
-    status: ScreenUpdateStatus;
-    message?: string;
-    errors?: Map<number, string>;
-
-}
-
-export enum ScreenUpdateStatus {
-    UPDATED = "UPDATED",
-    ERROR = "ERROR",
-    UNKNOWN = "UNKNOWN",
-    VALIDATION_ERROR = "VALIDATION_ERROR"
-}
