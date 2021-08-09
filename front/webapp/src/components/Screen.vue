@@ -22,6 +22,7 @@ import ElementTree from "@/components/ElementTree.vue";
 import {ApplicationModel, CategoryModel, ElementModel, PropertyModel, ScreenModel} from "@/model/api/api-models";
 import ApiService from "@/services/ApiService";
 import ScreenProcessingResponseHandler from "@/services/ScreenProcessingResponseHandler";
+import ToasterService from "@/services/ToasterService";
 
 @Component({
   components: {
@@ -45,14 +46,9 @@ export default class Screen extends Vue {
   private category!: CategoryModel;
   private screen!: ScreenModel;
 
-  private $bvToast: any;
-
   updateScreen() {
     if (!this.arePropertiesValid()) {
-      this.$bvToast.toast("Cannot perform screen update - there are validation errors", {
-        title: "Validation error",
-        variant: "danger"
-      });
+      ToasterService.error("Validation error", "Cannot perform screen update - there are validation errors");
       return;
     }
 

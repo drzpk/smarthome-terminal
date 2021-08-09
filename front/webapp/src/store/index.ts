@@ -3,10 +3,12 @@ import Vuex from 'vuex'
 import ApiService from "@/services/ApiService";
 import {ApplicationModel, CategoryModel} from "@/model/api/api-models";
 import {ScreenActionTypes, ScreenModule} from './screen';
+import {Toast} from "@/model/Toast";
 
 Vue.use(Vuex);
 
 export interface RootState {
+    toasts: Toast[];
     applications: ApplicationModel[];
     categories: CategoryModel[];
     application: ApplicationModel | null;
@@ -15,6 +17,7 @@ export interface RootState {
 
 export default new Vuex.Store<RootState>({
     state: {
+        toasts: [],
         applications: [],
         categories: [],
         application: null,
@@ -28,6 +31,17 @@ export default new Vuex.Store<RootState>({
         }
     },
     mutations: {
+        addToasts(state, toasts: Toast[]) {
+            state.toasts.push(...toasts);
+        },
+        removeToasts(state, toasts: Toast[]) {
+            for (const toast of toasts) {
+                const index = state.toasts.indexOf(toast);
+                if (index > -1) {
+                    Vue.delete(state.toasts, index);
+                }
+            }
+        },
         setApplications(state, applications) {
             state.applications = applications;
         },
