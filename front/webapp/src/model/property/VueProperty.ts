@@ -2,7 +2,7 @@ import {Component, Prop, Vue, Watch} from "vue-property-decorator";
 import {PropertyModel} from "@/model/api/api-models";
 import {Validator, Validators} from "@/model/property/validators";
 import {NotImplementedError} from "@/model/errors";
-import {ScreenMutationTypes} from "@/store/screen";
+import {ScreenMutationTypes} from "@/store/screen/screen-types";
 
 interface Validation {
     isValid: boolean;

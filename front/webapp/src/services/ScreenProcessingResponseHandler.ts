@@ -5,9 +5,9 @@ import {
     ScreenUpdateStatus,
     ScreenValidationErrorResponse
 } from "@/model/api/screen-update";
-import store from '@/store/index';
-import {ScreenMutationTypes} from "@/store/screen";
 import ToasterService from "@/services/ToasterService";
+import StoreProviderService from "@/services/StoreProviderService";
+import {ScreenMutationTypes} from "@/store/screen/screen-types";
 
 class ScreenProcessingResponseHandler {
 
@@ -31,7 +31,7 @@ class ScreenProcessingResponseHandler {
     }
 
     private static handleValidationError(response: ScreenValidationErrorResponse): void {
-        store.commit(ScreenMutationTypes.SET_SERVER_ERRORS, response.errors);
+        StoreProviderService.getStore().commit(ScreenMutationTypes.SET_SERVER_ERRORS, response.errors);
     }
 
     private static handleError(response: ScreenUpdateErrorResponse): void {

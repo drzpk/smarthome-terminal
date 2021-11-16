@@ -6,7 +6,7 @@ import VueAxios from 'vue-axios'
 import './plugins/bootstrap-vue'
 import App from './App.vue'
 import router from './router'
-import store from './store'
+import store from './store/root/root'
 
 import './styles/_root.scss'
 

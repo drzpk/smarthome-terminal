@@ -1,7 +1,7 @@
 import {Toast} from "@/model/Toast";
 
-import index from "@/store/index";
 import {BvToast} from "bootstrap-vue";
+import StoreProviderService from "@/services/StoreProviderService";
 
 class ToasterService {
     DEFAULT_DURATION = 5000;
@@ -30,7 +30,7 @@ class ToasterService {
             duration
         };
 
-        index.commit("addToasts", [toast]);
+        StoreProviderService.getStore().commit("addToasts", [toast]);
     }
 
     displayToast(bvToast: BvToast, toast: Toast) {

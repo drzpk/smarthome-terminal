@@ -22,15 +22,16 @@ import ToasterService from "@/services/ToasterService";
   }
 })
 export default class App extends Vue {
-  private $bvToast: BvToast;
-  toasts!: Toast[];
+  $bvToast!: BvToast;
+
+  private toasts!: Toast[];
 
   mounted(): void {
     ElementManager.registerElementComponents();
   }
 
   @Watch("toasts")
-  private onToastsChanged(): void {
+  onToastsChanged(): void {
     if (this.toasts.length == 0)
       return;
 

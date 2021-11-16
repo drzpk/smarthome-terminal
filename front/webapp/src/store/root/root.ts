@@ -2,20 +2,15 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import ApiService from "@/services/ApiService";
 import {ApplicationModel, CategoryModel} from "@/model/api/api-models";
-import {ScreenActionTypes, ScreenModule} from './screen';
+import {ScreenActionTypes} from './../screen/screen-types';
 import {Toast} from "@/model/Toast";
+import {RootState} from "@/store/root/root-types";
+import {ScreenModule} from "@/store/screen/screen";
+import StoreProviderService from "@/services/StoreProviderService";
 
 Vue.use(Vuex);
 
-export interface RootState {
-    toasts: Toast[];
-    applications: ApplicationModel[];
-    categories: CategoryModel[];
-    application: ApplicationModel | null;
-    category: CategoryModel | null;
-}
-
-export default new Vuex.Store<RootState>({
+const root = new Vuex.Store<RootState>({
     state: {
         toasts: [],
         applications: [],
@@ -88,4 +83,7 @@ export default new Vuex.Store<RootState>({
     modules: {
         ScreenModule
     }
-})
+});
+
+StoreProviderService.register(root);
+export default root;

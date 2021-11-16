@@ -1,24 +1,10 @@
 import {ActionContext, ActionTree, GetterTree, Module, MutationTree} from 'vuex'
-import {RootState} from "@/store/index";
+import {RootState} from "@/store/root/root-types";
 import {ApplicationModel, ScreenModel} from "@/model/api/api-models";
 import ApiService from "@/services/ApiService";
-
-export interface ScreenState {
-    screen: ScreenModel | null;
-    screenLoading: boolean;
-    serverErrors: Map<number, string>;
-}
-
-export enum ScreenMutationTypes {
-    SET_SCREEN = "SET_SCREEN",
-    SET_SCREEN_LOADING = "SET_SCREEN_LOADING",
-    SET_SERVER_ERRORS = "SET_SERVER_ERRORS",
-    CLEAR_SERVER_ERROR = "CLEAR_SERVER_ERROR"
-}
-
-export enum ScreenActionTypes {
-    SET_ACTIVE_SCREEN = "SET_ACTIVE_SCREEN"
-}
+import {ScreenUpdateData} from "@/model/screen";
+import ScreenProcessingResponseHandler from "@/services/ScreenProcessingResponseHandler";
+import {ScreenActionTypes, ScreenMutationTypes, ScreenState} from "@/store/screen/screen-types";
 
 type Getters = {
     getServerError(state: ScreenState): (fieldId: number) => string | null;
@@ -39,6 +25,7 @@ type ScreenActionContext = {
 
 interface Actions {
     [ScreenActionTypes.SET_ACTIVE_SCREEN](context: ScreenActionContext, screenId: number): void;
+    [ScreenActionTypes.UPDATE_SCREEN](context: ScreenActionContext, data: ScreenUpdateData): void;
 }
 
 //////////////////
@@ -104,7 +91,19 @@ const actions: ActionTree<ScreenState, RootState> & Actions = {
             console.error(error);
         }).then(() => {
             context.commit(ScreenMutationTypes.SET_SCREEN_LOADING, false);
-        })
+        });
+    },
+
+    [ScreenActionTypes.UPDATE_SCREEN](context: ScreenActionContext, data: ScreenUpdateData): void {
+        context.commit(ScreenMutationTypes.SET_SCREEN_LOADING, true);
+
+        ApiService.updateScreen(data).then(response => {
+            ScreenProcessingResponseHandler.handle(response);
+        }).catch(error => {
+            console.error(error);
+        }).then(() => {
+            context.commit(ScreenMutationTypes.SET_SCREEN_LOADING, false);
+        });
     }
 }
 

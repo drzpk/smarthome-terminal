@@ -2,6 +2,7 @@ import {ApplicationModel, CategoryModel, ScreenModel} from "@/model/api/api-mode
 
 import Axios, {AxiosResponse} from "axios";
 import {ProcessScreenUpdateRequest, ProcessScreenUpdateResponse} from "@/model/api/screen-update";
+import {ScreenUpdateData} from "@/model/screen";
 
 const API_URL = "http://localhost:8080/api";
 
@@ -25,13 +26,13 @@ class ApiService {
         });
     }
 
-    updateScreen(applicationId: number, categoryid: number, properties: Map<number, string | null>): Promise<ProcessScreenUpdateResponse> {
+    updateScreen(data: ScreenUpdateData): Promise<ProcessScreenUpdateResponse> {
         const request: ProcessScreenUpdateRequest = {
-            screenId: categoryid,
-            properties: Object.fromEntries(properties)
+            screenId: data.categoryId,
+            properties: Object.fromEntries(data.properties)
         };
 
-        return Axios.post(API_URL + `/applications/${applicationId}/categories/${categoryid}/screen`, request).then((response) => {
+        return Axios.post(API_URL + `/applications/${data.applicationId}/categories/${data.categoryId}/screen`, request).then((response) => {
             return response.data as ProcessScreenUpdateResponse;
         });
     }

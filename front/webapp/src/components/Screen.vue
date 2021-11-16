@@ -20,9 +20,9 @@ import {Component, Vue} from "vue-property-decorator";
 import {mapGetters, mapState} from "vuex";
 import ElementTree from "@/components/ElementTree.vue";
 import {ApplicationModel, CategoryModel, ElementModel, PropertyModel, ScreenModel} from "@/model/api/api-models";
-import ApiService from "@/services/ApiService";
-import ScreenProcessingResponseHandler from "@/services/ScreenProcessingResponseHandler";
 import ToasterService from "@/services/ToasterService";
+import {ScreenActionTypes} from "@/store/screen/screen-types";
+import {ScreenUpdateData} from "@/model/screen";
 
 @Component({
   components: {
@@ -52,10 +52,13 @@ export default class Screen extends Vue {
       return;
     }
 
-    // todo: spinner when waiting for server response
-    ApiService.updateScreen(this.application.id, this.category.id, this.serializeProperties()).then(response => {
-      ScreenProcessingResponseHandler.handle(response);
-    });
+    const data: ScreenUpdateData = {
+      applicationId: this.application.id,
+      categoryId: this.category.id,
+      properties: this.serializeProperties()
+    };
+
+    this.$store.dispatch(ScreenActionTypes.UPDATE_SCREEN, data);
   }
 
   private arePropertiesValid(root: ElementModel = this.screen): boolean {
