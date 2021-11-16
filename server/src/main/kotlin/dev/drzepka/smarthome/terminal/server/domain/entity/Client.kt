@@ -4,6 +4,10 @@ import dev.drzepka.smarthome.terminal.server.domain.Configuration
 import dev.drzepka.smarthome.terminal.server.domain.value.Category
 import java.time.Instant
 
+/**
+ * Represents a terminal client - a backend service that is registered in the terminal server and exposes
+ * a number of [Screen]s that allow to interface with the service.
+ */
 class Client(val id: Int, val name: String) {
 
     var categories: List<Category>? = null
